@@ -52,26 +52,49 @@ export default function Hero() {
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ink"
     >
-      {/* ── Auto-playing Crossfade Slider ── */}
-      <AnimatePresence mode="sync">
-        <motion.img
-          key={`${isMobile ? 'm' : 'd'}-${current}`}
-          src={activeSlides[current]}
-          alt={`Moroccan Elegance Slide ${current + 1}`}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.5, ease: 'easeOut' }}
-          className="absolute inset-0 w-full h-full object-cover object-center z-0"
-        />
-      </AnimatePresence>
-
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/40 z-0 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-b from-charcoal/60 via-charcoal/40 to-charcoal/95 z-0 pointer-events-none" />
+      {/* ── Background Slider (Desktop) or Grid (Mobile) ── */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {isMobile ? (
+          <div className="grid grid-cols-2 grid-rows-2 h-full w-full">
+            {mobileSlides.slice(0, 4).map((img, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 1.1 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, delay: idx * 0.2 }}
+                className="relative overflow-hidden border-[0.5px] border-black/10"
+              >
+                <img
+                  src={img}
+                  alt={`Slide ${idx}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black/20" />
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <AnimatePresence mode="sync">
+            <motion.img
+              key={`d-${current}`}
+              src={desktopSlides[current]}
+              alt={`Moroccan Elegance Slide ${current + 1}`}
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: 'easeOut' }}
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          </AnimatePresence>
+        )}
+        
+        {/* Universal Overlays for Readability */}
+        <div className="absolute inset-0 bg-black/30 z-10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 via-transparent to-charcoal/80 z-10 pointer-events-none" />
+      </div>
 
       {/* ── Content ── */}
-      <div className="relative z-10 section-container text-center w-full pt-[60px] pb-[40px] md:pt-[100px] md:pb-[80px] flex flex-col items-center justify-center min-h-screen -translate-y-16 md:translate-y-0">
+      <div className="relative z-20 section-container text-center w-full pt-[60px] pb-[40px] md:pt-[100px] md:pb-[80px] flex flex-col items-center justify-center min-h-screen">
         {/* Ornament */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
