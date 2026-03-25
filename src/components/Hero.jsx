@@ -71,7 +71,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-charcoal/60 via-charcoal/40 to-charcoal/95 z-0 pointer-events-none" />
 
       {/* ── Content ── */}
-      <div className="relative z-10 section-container text-center w-full pt-[100px] pb-[80px] flex flex-col items-center justify-center min-h-screen">
+      <div className="relative z-10 section-container text-center w-full pt-[60px] pb-[40px] md:pt-[100px] md:pb-[80px] flex flex-col items-center justify-center min-h-screen -translate-y-16 md:translate-y-0">
         {/* Ornament */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
