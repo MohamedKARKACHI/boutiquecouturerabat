@@ -52,25 +52,37 @@ export default function Hero() {
       id="hero"
       className="relative h-[100dvh] md:h-screen w-full flex items-center justify-center overflow-hidden bg-black"
     >
-      {/* ── Full-Screen Dynamic Background Slider ── */}
-      <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="popLayout">
-          <motion.img
-            key={`${isMobile ? 'm' : 'd'}-${current}`}
-            src={activeSlides[current]}
-            alt="Moroccan Elegance"
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 1.05 }}
-            transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
-            className="absolute inset-0 w-full h-full object-cover object-center"
-          />
-        </AnimatePresence>
+      {/* ── Background: Single Image (Mobile) or Slider (Desktop) ── */}
+      <div className="absolute inset-0 z-0 overflow-hidden bg-black">
+        {isMobile ? (
+          <div className="absolute inset-0">
+            <img
+              src={slide6}
+              alt="Moroccan Boutique"
+              className="w-full h-full object-cover object-center"
+            />
+            {/* Direct Mobile Overlay for Readability */}
+            <div className="absolute inset-0 bg-black/40" />
+          </div>
+        ) : (
+          <AnimatePresence mode="popLayout">
+            <motion.img
+              key={`d-${current}`}
+              src={desktopSlides[current]}
+              alt="Moroccan Elegance"
+              initial={{ opacity: 0, scale: 1.1 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
+          </AnimatePresence>
+        )}
         
-        {/* Cinematic Overlays for Maximum Readability */}
-        <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
+        {/* Cinematic Gradient Overlay */}
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none" />
       </div>
+
 
 
       {/* ── Hero Content ── */}
