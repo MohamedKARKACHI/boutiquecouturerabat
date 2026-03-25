@@ -11,7 +11,7 @@ import slide7 from '../assets/slide7.jpg' // Portrait
 import slide8 from '../assets/slide8.jpg' // Portrait
 
 const desktopSlides = [slide1, slide2, slide3, slide4, slide5]
-const mobileSlides = [slide6, slide7, slide8, slide4] // added slide4 as it crops well vertically too
+const mobileSlides = [slide6, slide7, slide8] 
 
 export default function Hero() {
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -50,36 +50,25 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative h-[100dvh] md:h-screen w-full flex items-center justify-center overflow-hidden bg-black"
+      className="relative h-[100dvh] md:h-[85vh] w-full flex items-center justify-center overflow-hidden bg-black"
     >
-      {/* ── Background: Single Image (Mobile) or Slider (Desktop) ── */}
+      {/* ── Background: Responsive Dynamic Slider ── */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-black">
-        {isMobile ? (
-          <div className="absolute inset-0">
-            <img
-              src={slide6}
-              alt="Moroccan Boutique"
-              className="w-full h-full object-cover object-center"
-            />
-            {/* Direct Mobile Overlay for Readability */}
-            <div className="absolute inset-0 bg-black/40" />
-          </div>
-        ) : (
-          <AnimatePresence mode="popLayout">
-            <motion.img
-              key={`d-${current}`}
-              src={desktopSlides[current]}
-              alt="Moroccan Elegance"
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 1.05 }}
-              transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute inset-0 w-full h-full object-cover object-center"
-            />
-          </AnimatePresence>
-        )}
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.img
+            key={`${isMobile ? 'm' : 'd'}-${current}`}
+            src={activeSlides[current % activeSlides.length]}
+            alt="Moroccan Elegance"
+            initial={{ opacity: 0, scale: isMobile ? 1.15 : 1.05 }}
+            animate={{ opacity: 1, scale: isMobile ? 1.1 : 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
+            className={`absolute inset-0 w-full h-full object-cover ${isMobile ? 'object-center' : 'md:object-center'}`}
+          />
+        </AnimatePresence>
         
-        {/* Cinematic Gradient Overlay */}
+        {/* Cinematic Readability Overlays */}
+        <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
         <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none" />
       </div>
 
