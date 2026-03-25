@@ -50,49 +50,31 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative h-[100dvh] md:min-h-screen flex items-center justify-center overflow-hidden bg-ink"
+      className="relative h-[100dvh] md:h-screen w-full flex items-center justify-center overflow-hidden bg-black"
     >
-      {/* ── Background: Mobile 2x2 Editorial Grid ── */}
-      <div className="md:hidden absolute inset-0 z-0 grid grid-cols-2 grid-rows-2 overflow-hidden bg-black">
-        {mobileSlides.slice(0, 4).map((img, idx) => (
-          <div key={idx} className="relative w-full h-full overflow-hidden">
-            <motion.img
-              initial={{ scale: 1.25, opacity: 0 }}
-              animate={{ scale: 1.15, opacity: 1 }}
-              transition={{ duration: 1.2, delay: idx * 0.1 }}
-              src={img}
-              alt={`Gallery ${idx}`}
-              className="absolute inset-0 w-full h-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-black/15" />
-          </div>
-        ))}
-      </div>
-
-      {/* ── Background: Desktop Slider ── */}
-      <div className="hidden md:block absolute inset-0 z-0 overflow-hidden">
-        <AnimatePresence mode="sync">
+      {/* ── Full-Screen Dynamic Background Slider ── */}
+      <div className="absolute inset-0 z-0">
+        <AnimatePresence mode="popLayout">
           <motion.img
-            key={`d-${current}`}
-            src={desktopSlides[current]}
-            alt={`Moroccan Elegance Slide ${current + 1}`}
-            initial={{ opacity: 0, scale: 1.05 }}
+            key={`${isMobile ? 'm' : 'd'}-${current}`}
+            src={activeSlides[current]}
+            alt="Moroccan Elegance"
+            initial={{ opacity: 0, scale: 1.1 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: 'easeOut' }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 1.5, ease: [0.4, 0, 0.2, 1] }}
             className="absolute inset-0 w-full h-full object-cover object-center"
           />
         </AnimatePresence>
+        
+        {/* Cinematic Overlays for Maximum Readability */}
+        <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
+        <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none" />
       </div>
 
-      {/* Universal Overlay for all viewports */}
-      <div className="absolute inset-0 z-10 pointer-events-none">
-        <div className="absolute inset-0 bg-black/10 md:bg-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 via-transparent to-charcoal/70 md:to-charcoal/80" />
-      </div>
 
-      {/* ── Content ── */}
-      <div className="relative z-20 section-container text-center w-full flex flex-col items-center justify-center h-full pt-16">
+      {/* ── Hero Content ── */}
+      <div className="relative z-20 container mx-auto px-6 text-center h-full flex flex-col items-center justify-center pt-12">
         {/* Ornament */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
