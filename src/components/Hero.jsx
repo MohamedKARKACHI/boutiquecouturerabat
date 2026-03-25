@@ -50,51 +50,46 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ink"
+      className="relative h-[100dvh] md:min-h-screen flex items-center justify-center overflow-hidden bg-ink"
     >
-      {/* ── Background Slider (Desktop) or Grid (Mobile) ── */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        {isMobile ? (
-          <div className="grid grid-cols-2 grid-rows-2 h-full w-full">
-            {mobileSlides.slice(0, 4).map((img, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 1.1 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1, delay: idx * 0.2 }}
-                className="relative overflow-hidden border-[0.5px] border-black/10"
-              >
-                <img
-                  src={img}
-                  alt={`Slide ${idx}`}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/20" />
-              </motion.div>
-            ))}
-          </div>
-        ) : (
-          <AnimatePresence mode="sync">
-            <motion.img
-              key={`d-${current}`}
-              src={desktopSlides[current]}
-              alt={`Moroccan Elegance Slide ${current + 1}`}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.5, ease: 'easeOut' }}
-              className="absolute inset-0 w-full h-full object-cover object-center"
+      {/* ── Background: Mobile 2x2 Editorial Grid ── */}
+      <div className="md:hidden absolute inset-0 z-0 grid grid-cols-2 grid-rows-2 gap-[1px] bg-charcoal">
+        {mobileSlides.slice(0, 4).map((img, idx) => (
+          <div key={idx} className="relative w-full h-full overflow-hidden">
+            <img
+              src={img}
+              alt={`Gallery ${idx}`}
+              className="w-full h-full object-cover"
             />
-          </AnimatePresence>
-        )}
-        
-        {/* Universal Overlays for Readability */}
-        <div className="absolute inset-0 bg-black/30 z-10 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 via-transparent to-charcoal/80 z-10 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/30" />
+          </div>
+        ))}
+      </div>
+
+      {/* ── Background: Desktop Slider ── */}
+      <div className="hidden md:block absolute inset-0 z-0 overflow-hidden">
+        <AnimatePresence mode="sync">
+          <motion.img
+            key={`d-${current}`}
+            src={desktopSlides[current]}
+            alt={`Moroccan Elegance Slide ${current + 1}`}
+            initial={{ opacity: 0, scale: 1.05 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: 'easeOut' }}
+            className="absolute inset-0 w-full h-full object-cover object-center"
+          />
+        </AnimatePresence>
+      </div>
+
+      {/* Universal Overlay for all viewports */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 via-transparent to-charcoal/80" />
       </div>
 
       {/* ── Content ── */}
-      <div className="relative z-20 section-container text-center w-full pt-[60px] pb-[40px] md:pt-[100px] md:pb-[80px] flex flex-col items-center justify-center min-h-screen">
+      <div className="relative z-20 section-container text-center w-full flex flex-col items-center justify-center h-full pt-16">
         {/* Ornament */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
