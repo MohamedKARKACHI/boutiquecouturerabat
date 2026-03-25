@@ -53,15 +53,18 @@ export default function Hero() {
       className="relative h-[100dvh] md:min-h-screen flex items-center justify-center overflow-hidden bg-ink"
     >
       {/* ── Background: Mobile 2x2 Editorial Grid ── */}
-      <div className="md:hidden absolute inset-0 z-0 grid grid-cols-2 grid-rows-2 gap-[1px] bg-charcoal">
+      <div className="md:hidden absolute inset-0 z-0 grid grid-cols-2 grid-rows-2">
         {mobileSlides.slice(0, 4).map((img, idx) => (
           <div key={idx} className="relative w-full h-full overflow-hidden">
-            <img
+            <motion.img
+              initial={{ scale: 1.2, opacity: 0 }}
+              animate={{ scale: 1.1, opacity: 1 }}
+              transition={{ duration: 1.2, delay: idx * 0.1 }}
               src={img}
               alt={`Gallery ${idx}`}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-black/30" />
+            <div className="absolute inset-0 bg-black/15" />
           </div>
         ))}
       </div>
@@ -84,8 +87,8 @@ export default function Hero() {
 
       {/* Universal Overlay for all viewports */}
       <div className="absolute inset-0 z-10 pointer-events-none">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 via-transparent to-charcoal/80" />
+        <div className="absolute inset-0 bg-black/10 md:bg-black/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-charcoal/40 via-transparent to-charcoal/70 md:to-charcoal/80" />
       </div>
 
       {/* ── Content ── */}
