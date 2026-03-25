@@ -53,16 +53,16 @@ export default function Hero() {
       className="relative h-[100dvh] md:min-h-screen flex items-center justify-center overflow-hidden bg-ink"
     >
       {/* ── Background: Mobile 2x2 Editorial Grid ── */}
-      <div className="md:hidden absolute inset-0 z-0 grid grid-cols-2 grid-rows-2">
+      <div className="md:hidden absolute inset-0 z-0 grid grid-cols-2 grid-rows-2 overflow-hidden bg-black">
         {mobileSlides.slice(0, 4).map((img, idx) => (
           <div key={idx} className="relative w-full h-full overflow-hidden">
             <motion.img
-              initial={{ scale: 1.2, opacity: 0 }}
-              animate={{ scale: 1.1, opacity: 1 }}
+              initial={{ scale: 1.25, opacity: 0 }}
+              animate={{ scale: 1.15, opacity: 1 }}
               transition={{ duration: 1.2, delay: idx * 0.1 }}
               src={img}
               alt={`Gallery ${idx}`}
-              className="w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 bg-black/15" />
           </div>
