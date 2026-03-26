@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { HiPlus, HiPencilAlt, HiTrash, HiCheck } from 'react-icons/hi'
+import { HiPlus, HiPencilAlt, HiTrash, HiCheck, HiX } from 'react-icons/hi'
 import { fetchProducts, fetchCategories, fetchProductById } from '../../api'
 import ConfirmationModal from './ConfirmationModal'
 
@@ -26,6 +26,7 @@ export default function ProductAdmin() {
     removeImages: []
   })
   const [deleteId, setDeleteId] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -55,7 +56,7 @@ export default function ProductAdmin() {
         is_featured: !!detail.is_featured,
         image: null,
         gallery: [],
-        existingGallery: detail.images || [],
+        existingGallery: detail.images || [], // Now objects {id, path}
         removeImages: []
       })
       setIsEditing(true)
@@ -64,6 +65,7 @@ export default function ProductAdmin() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsSubmitting(true)
     const method = formData.id ? 'PUT' : 'POST'
     const data = new FormData()
     
@@ -84,6 +86,7 @@ export default function ProductAdmin() {
       formData.gallery.forEach(file => data.append('gallery', file))
     }
     if (formData.removeImages.length > 0) {
+      // Send only IDs for deletion
       data.append('remove_images', JSON.stringify(formData.removeImages))
     }
 
@@ -95,9 +98,17 @@ export default function ProductAdmin() {
       if (resp.ok) {
         setIsEditing(false)
         setFormData({ id: null, title: '', title_en: '', slug: '', price: '', category_id: '', description: '', description_en: '', in_stock: true, is_featured: false, image: null, gallery: [], existingGallery: [], removeImages: [] })
-        loadData()
+        await loadData()
+      } else {
+        const errData = await resp.json()
+        alert(`Error: ${errData.error || 'Server error'}`)
       }
-    } catch (err) { console.error(err) }
+    } catch (err) { 
+      console.error(err)
+      alert('Network Error: Could not connect to server')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleDelete = async () => {
@@ -245,16 +256,16 @@ export default function ProductAdmin() {
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 bg-white/50 p-4 rounded-2xl min-h-[120px] border border-sand/50">
                   {/* Current Gallery Previews (Existing) */}
                   {formData.existingGallery.map((img, idx) => (
-                    <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-sand group shadow-sm bg-white">
-                      <img src={`${API_URL}/uploads/${img}`} className="w-full h-full object-cover" />
+                    <div key={`existing-${img.id || idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-sand group shadow-sm bg-white">
+                      <img src={`${API_URL}/uploads/${img.path}`} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-red-500/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button 
                           type="button"
                           onClick={() => {
                             setFormData({
                               ...formData,
-                              existingGallery: formData.existingGallery.filter(g => g !== img),
-                              removeImages: [...formData.removeImages, img]
+                              existingGallery: formData.existingGallery.filter(g => g.id !== img.id),
+                              removeImages: [...formData.removeImages, img.id]
                             })
                           }}
                           className="text-white transform hover:scale-125 transition-transform"
@@ -314,9 +325,15 @@ export default function ProductAdmin() {
               </button>
               <button 
                 type="submit"
-                className="bg-charcoal text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-gold transition-all"
+                disabled={isSubmitting}
+                className="bg-charcoal text-white px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-gold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                Enregistrer le produit
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Enregistrement...
+                  </>
+                ) : 'Enregistrer le produit'}
               </button>
             </div>
           </form>
