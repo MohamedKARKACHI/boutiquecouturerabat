@@ -2,30 +2,51 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { HiOutlineLocationMarker, HiOutlineClock, HiOutlinePhone } from 'react-icons/hi'
 import Ornament from './Ornament'
+import { useLanguage } from '../context/LanguageContext'
+
+const TRANSLATIONS = {
+  FR: {
+    badge: 'Visitez Nous',
+    title: <>Nous <span className="italic text-majorelle">Trouver</span></>,
+    cta: 'Réserver une Consultation',
+    whatsappMsg: 'Bonjour, je souhaite réserver une consultation'
+  },
+  EN: {
+    badge: 'Visit Us',
+    title: <>Find <span className="italic text-majorelle">Us</span></>,
+    cta: 'Book a Consultation',
+    whatsappMsg: 'Hello, I would like to book a consultation'
+  }
+}
 
 /* ── Data constant ── */
-const INFO_CARDS = [
+const getInfoCards = (lang) => [
   {
     id: 1,
     icon: HiOutlineLocationMarker,
-    title: 'Adresse',
+    title: lang === 'FR' ? 'Adresse' : 'Address',
     lines: ['Souk des Teinturiers', 'Médina de Marrakech', 'Marrakech, Morocco'],
   },
   {
     id: 2,
     icon: HiOutlineClock,
-    title: 'Horaires',
-    lines: ['Lundi – Samedi', '9h00 – 19h00', 'Dimanche : Sur rendez-vous'],
+    title: lang === 'FR' ? 'Horaires' : 'Hours',
+    lines: lang === 'FR' 
+      ? ['Lundi – Samedi', '9h00 – 19h00', 'Dimanche : Sur rendez-vous']
+      : ['Monday – Saturday', '9:00 AM – 7:00 PM', 'Sunday: By appointment'],
   },
   {
     id: 3,
     icon: HiOutlinePhone,
-    title: 'Contact',
-    lines: ['+212 666 780 147', 'WhatsApp disponible', 'boutiquecouturerabat@gmail.com'],
+    title: lang === 'FR' ? 'Contact' : 'Contact',
+    lines: ['+212 666 780 147', lang === 'FR' ? 'WhatsApp disponible' : 'WhatsApp available', 'boutiquecouturerabat@gmail.com'],
   },
 ]
 
 export default function Contact() {
+  const { lang } = useLanguage()
+  const T = TRANSLATIONS[lang]
+  const INFO_CARDS = getInfoCards(lang)
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
@@ -40,9 +61,9 @@ export default function Contact() {
           transition={{ duration: 0.7 }}
           className="text-center mb-12 md:mb-16"
         >
-          <p className="font-accent text-sm tracking-[0.4em] text-gold uppercase mb-2">Visit Us</p>
+          <p className="font-accent text-sm tracking-[0.4em] text-gold uppercase mb-2">{T.badge}</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-charcoal font-semibold mb-4">
-            Nous <span className="italic text-majorelle">Trouver</span>
+            {T.title}
           </h2>
           <Ornament icon="◆" />
         </motion.div>
@@ -75,8 +96,8 @@ export default function Contact() {
             <motion.a
               initial={{ opacity: 0, y: 16 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.45 }}
-              href="https://wa.me/212666780147?text=Bonjour%2C%20je%20souhaite%20réserver%20une%20consultation"
+               transition={{ duration: 0.5, delay: 0.45 }}
+              href={`https://wa.me/212666780147?text=${encodeURIComponent(T.whatsappMsg)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-dark to-emerald text-ivory font-semibold text-sm tracking-widest uppercase rounded-full hover:shadow-[0_0_30px_rgba(13,107,75,0.3)] transition-all duration-500"
@@ -84,7 +105,7 @@ export default function Contact() {
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
               </svg>
-              Réserver une Consultation
+              {T.cta}
             </motion.a>
           </div>
 

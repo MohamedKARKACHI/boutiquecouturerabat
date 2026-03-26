@@ -1,21 +1,38 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Ornament from './Ornament'
+import { useLanguage } from '../context/LanguageContext'
 
-import slide1 from '../assets/slide1.jpg' // Landscape
-import slide2 from '../assets/slide2.jpg' // Landscape
-import slide3 from '../assets/slide3.jpg' // Landscape
-import slide4 from '../assets/slide4.jpg' // Landscape
-import slide5 from '../assets/slide5.jpg' // Landscape
-import slide6 from '../assets/slide6.jpg' // Portrait
-import slide7 from '../assets/slide7.jpg' // Portrait
-import slide8 from '../assets/slide8.jpg' // Portrait
+import slide1 from '../assets/slide1.jpg'
+import slide2 from '../assets/slide2.jpg'
+import slide3 from '../assets/slide3.jpg'
+import slide4 from '../assets/slide4.jpg'
+import mslide1 from '../assets/slide5.jpg'
+import mslide2 from '../assets/slide6.jpg'
+import mslide3 from '../assets/slide7.jpg'
+import mslide4 from '../assets/slide8.jpg'
 
+const desktopSlides = [slide1, slide2, slide3, slide4]
+const mobileSlides = [mslide1, mslide2, mslide3, mslide4]
 
-const desktopSlides = [slide1, slide2, slide3, slide4, slide5]
-const mobileSlides = [slide6, slide7, slide8] 
+const TRANSLATIONS = {
+  FR: {
+    location: 'MARRAKECH · MAROC',
+    title: "L’Élégance du Caftan Marocain Authentique",
+    subtitle: "Haute Couture & Créations Sur-Mesure par Aziz Bousseta",
+    cta: "Explorer la Collection"
+  },
+  EN: {
+    location: 'MARRAKECH · MOROCCO',
+    title: "Authentic Moroccan Caftan & Haute Couture",
+    subtitle: "Bespoke Luxury Creations by Master Tailor Aziz Bousseta",
+    cta: "Explore Collection"
+  }
+}
 
 export default function Hero() {
+  const { lang } = useLanguage()
+  const T = TRANSLATIONS[lang]
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
   const [current, setCurrent] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
@@ -86,10 +103,8 @@ export default function Hero() {
           className="mb-4 md:mb-6 w-full flex flex-col items-center"
         >
           <Ornament className="mb-3 w-full" />
-          <div className="relative flex items-center justify-center font-accent text-[10px] md:text-sm uppercase text-gold-light/80 w-full h-4 md:h-5">
-            <span className="absolute right-1/2 mr-2 md:mr-3 tracking-[0.4em]">MARRAKECH</span>
-            <span className="absolute left-1/2 -translate-x-1/2 opacity-80">·</span>
-            <span className="absolute left-1/2 ml-2 md:ml-3 tracking-[0.4em] pl-[0.4em]">MOROCCO</span>
+          <div className="relative flex items-center justify-center font-accent text-[10px] md:text-sm uppercase text-gold-light/80 w-full h-4 md:h-5 tracking-[0.4em]">
+            {T.location}
           </div>
         </motion.div>
 
@@ -100,11 +115,7 @@ export default function Hero() {
           transition={{ duration: 0.9, delay: 0.45 }}
           className="font-display text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-tight mb-4 md:mb-6 max-w-4xl mx-auto text-balance"
         >
-          Authentic Moroccan{' '}
-          <span className="shimmer-text">Elegance</span>,
-          <span className="block mt-1 md:mt-2">
-            Tailored to <span className="italic font-accent font-light">You</span>
-          </span>
+          {T.title}
         </motion.h1>
 
         {/* Sub */}
@@ -114,9 +125,7 @@ export default function Hero() {
           transition={{ duration: 0.9, delay: 0.7 }}
           className="font-accent text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-6 md:mb-8 leading-relaxed text-balance"
         >
-          Bespoke traditional wear crafted by Master Tailor{' '}
-          <span className="text-gold font-semibold tracking-wide">Aziz Bousseta</span>{' '}
-          in the heart of Marrakech.
+          {T.subtitle}
         </motion.p>
 
         {/* CTA */}
@@ -130,7 +139,7 @@ export default function Hero() {
             onClick={() => scrollTo('categories')}
             className="group relative inline-flex items-center gap-4 px-6 md:px-8 py-3.5 md:py-4 border border-gold/60 text-gold font-light text-[10px] md:text-xs tracking-[0.3em] uppercase rounded-full overflow-hidden transition-all duration-500 hover:border-gold hover:shadow-[0_0_20px_rgba(212,168,67,0.3)] bg-transparent backdrop-blur-sm"
           >
-            <span className="relative z-10 transition-colors duration-500 group-hover:text-gold-light">Discover the Collection</span>
+            <span className="relative z-10 transition-colors duration-500 group-hover:text-gold-light">{T.cta}</span>
             <svg className="relative z-10 w-3 h-3 md:w-4 md:h-4 transition-all duration-500 group-hover:translate-x-2 group-hover:text-gold-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

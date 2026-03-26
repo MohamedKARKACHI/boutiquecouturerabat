@@ -2,6 +2,22 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { HiOutlineChat, HiOutlineScissors, HiOutlineGlobe } from 'react-icons/hi'
 import Ornament from './Ornament'
+import { useLanguage } from '../context/LanguageContext'
+
+const TRANSLATIONS = {
+  FR: {
+    badge: 'Notre Processus',
+    title: <>L'Art du <span className="text-gold-dark italic">Sur-Mesure</span></>,
+    subText: 'De votre vision à votre garde-robe — une expérience sur-mesure sans faille',
+    cta: 'Commander Maintenant'
+  },
+  EN: {
+    badge: 'Our Process',
+    title: <>The Art of <span className="text-gold-dark italic">Bespoke</span></>,
+    subText: 'From your vision to your wardrobe — a seamless bespoke experience',
+    cta: 'Order Now'
+  }
+}
 
 /* ── Data constant ── */
 const STEPS = [
@@ -9,47 +25,46 @@ const STEPS = [
     id: 1,
     number: '01',
     icon: HiOutlineChat,
-    titleFr: 'Consultation & Mesures',
-    titleEn: 'Consultation & Measurements',
-    description:
-      'Partagez votre vision avec nous via WhatsApp. Envoyez vos mesures et choisissez parmi notre collection exclusive de tissus.',
+    title: { FR: 'Consultation & Mesures', EN: 'Consultation & Measurements' },
+    desc: {
+      FR: 'Partagez votre vision avec nous via WhatsApp. Envoyez vos mesures et choisissez parmi notre collection exclusive de tissus.',
+      EN: 'Share your vision with us via WhatsApp. Send your measurements and choose from our exclusive fabric collection.'
+    },
     iconBg: 'bg-majorelle/15',
     iconColor: 'text-majorelle',
-    borderColor: 'border-majorelle/20',
-    gradient: 'from-majorelle/15 to-majorelle/5',
     accent: 'bg-majorelle',
   },
   {
     id: 2,
     number: '02',
     icon: HiOutlineScissors,
-    titleFr: 'Confection Artisanale',
-    titleEn: 'Artisanal Crafting',
-    description:
-      'Votre vêtement est méticuleusement confectionné dans notre atelier à Marrakech, selon des techniques ancestrales transmises de génération en génération.',
+    title: { FR: 'Confection Artisanale', EN: 'Artisanal Crafting' },
+    desc: {
+      FR: 'Votre vêtement est méticuleusement confectionné dans notre atelier à Rabat, selon des techniques ancestrales.',
+      EN: 'Your garment is meticulously crafted in our Rabat atelier, using ancestral techniques passed down through generations.'
+    },
     iconBg: 'bg-emerald/15',
     iconColor: 'text-emerald',
-    borderColor: 'border-emerald/20',
-    gradient: 'from-emerald/15 to-emerald/5',
     accent: 'bg-emerald',
   },
   {
     id: 3,
     number: '03',
     icon: HiOutlineGlobe,
-    titleFr: 'Livraison Mondiale',
-    titleEn: 'Worldwide Shipping',
-    description:
-      'Votre création sur-mesure est soigneusement emballée et expédiée partout dans le monde. Suivez votre commande à chaque étape.',
+    title: { FR: 'Livraison Mondiale', EN: 'Worldwide Shipping' },
+    desc: {
+      FR: 'Votre création sur-mesure est soigneusement expédiée partout dans le monde. Suivez votre commande à chaque étape.',
+      EN: 'Your bespoke creation is carefully shipped anywhere in the world. Track your order at every step.'
+    },
     iconBg: 'bg-terracotta/15',
     iconColor: 'text-terracotta',
-    borderColor: 'border-terracotta/20',
-    gradient: 'from-terracotta/15 to-terracotta/5',
     accent: 'bg-terracotta',
   },
 ]
 
 export default function SurMesure() {
+  const { lang } = useLanguage()
+  const T = TRANSLATIONS[lang]
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
@@ -68,12 +83,12 @@ export default function SurMesure() {
           transition={{ duration: 0.7 }}
           className="text-center mb-12 md:mb-20"
         >
-          <p className="font-accent text-sm tracking-[0.4em] text-gold uppercase mb-2">Notre Processus</p>
+          <p className="font-accent text-sm tracking-[0.4em] text-gold uppercase mb-2">{T.badge}</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-charcoal font-semibold mb-4">
-            L'Art du <span className="text-gold-dark italic">Sur-Mesure</span>
+            {T.title}
           </h2>
           <p className="font-accent text-base md:text-lg text-smoke max-w-xl mx-auto leading-relaxed">
-            De votre vision à votre garde-robe — une expérience sur-mesure sans faille
+            {T.subText}
           </p>
           <Ornament className="mt-5" />
         </motion.div>
@@ -103,13 +118,10 @@ export default function SurMesure() {
 
               {/* Text */}
               <h3 className="relative z-10 font-display text-xl md:text-2xl text-charcoal font-semibold leading-snug mb-2">
-                {step.titleFr}
+                {step.title[lang]}
               </h3>
-              <p className="relative z-10 font-accent text-[10px] md:text-xs text-gold-dark tracking-[0.2em] uppercase mb-3 md:mb-5">
-                {step.titleEn}
-              </p>
               <p className="relative z-10 text-smoke leading-relaxed text-sm md:text-[15px]">
-                {step.description}
+                {step.desc[lang]}
               </p>
 
               {/* Accent bar */}
@@ -134,7 +146,7 @@ export default function SurMesure() {
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
             </svg>
-            Commander Maintenant
+            {T.cta}
           </a>
         </motion.div>
       </div>

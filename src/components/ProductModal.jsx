@@ -3,8 +3,48 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { HiX, HiChevronLeft, HiChevronRight } from 'react-icons/hi'
 import { FaWhatsapp } from 'react-icons/fa'
 import ImageViewer from './ImageViewer'
+import { useLanguage } from '../context/LanguageContext'
+
+const TRANSLATIONS = {
+  FR: {
+    sizeLabel: 'Sélectionner la Taille',
+    colorLabel: 'Couleur du Modèle',
+    nameLabel: 'Votre Nom Complet',
+    namePlaceholder: 'Saisissez votre nom...',
+    orderBtn: "Commander l'article",
+    paymentNote: 'Paiement à la livraison ou virement',
+    errorFields: 'Veuillez remplir votre nom et choisir une taille.',
+    orderHeader: '*NOUVELLE COMMANDE* 🛍️',
+    orderProduct: '*Produit :*',
+    orderCategory: '*Catégorie :*',
+    orderPrice: '*Prix :*',
+    orderSize: '*Taille :*',
+    orderColor: '*Couleur (Code Hex) :*',
+    orderClient: '*Client :*',
+    orderFooter: 'Je souhaite valider cette commande.'
+  },
+  EN: {
+    sizeLabel: 'Select Size',
+    colorLabel: 'Model Color',
+    nameLabel: 'Your Full Name',
+    namePlaceholder: 'Enter your name...',
+    orderBtn: 'Order Item',
+    paymentNote: 'Payment on delivery or bank transfer',
+    errorFields: 'Please fill in your name and choose a size.',
+    orderHeader: '*NEW ORDER* 🛍️',
+    orderProduct: '*Product:*',
+    orderCategory: '*Category:*',
+    orderPrice: '*Price:*',
+    orderSize: '*Size:*',
+    orderColor: '*Color (Hex Code):*',
+    orderClient: '*Client:*',
+    orderFooter: 'I would like to confirm this order.'
+  }
+}
 
 export default function ProductModal({ isOpen, product, onClose }) {
+  const { lang, t } = useLanguage()
+  const T = TRANSLATIONS[lang]
   const [selectedSize, setSelectedSize] = useState('')
   const [selectedColor, setSelectedColor] = useState('')
   const [customerName, setCustomerName] = useState('')
@@ -27,7 +67,15 @@ export default function ProductModal({ isOpen, product, onClose }) {
 
   const SIZES = ['S', 'M', 'L', 'XL', 'Sur Mesure']
 
-  const images = product?.images || (product ? [product.image] : [])
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  let images = []
+  if (product?.images && product.images.length > 0) {
+    images = product.images.map(img => img.startsWith('http') ? img : `${API_URL}/uploads/${img}`)
+  } else if (product?.main_image || product?.image) {
+    const mainImg = product.main_image || product.image
+    images = [mainImg.startsWith('http') ? mainImg : `${API_URL}/uploads/${mainImg}`]
+  }
 
   useEffect(() => {
     if (isOpen && product) {
@@ -64,7 +112,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
 
   const handleOrder = () => {
     if (!selectedSize || !customerName.trim()) {
-      alert("Veuillez remplir votre nom et choisir une taille.")
+      alert(T.errorFields)
       return
     }
 
@@ -72,14 +120,14 @@ export default function ProductModal({ isOpen, product, onClose }) {
       ? `${product.price} DH`
       : product.price
 
-    const message = `*NOUVELLE COMMANDE* 🛍️\n\n` +
-      `*Produit :* ${product.title}\n` +
-      `*Catégorie :* ${product.category || product.subtitle || ''}\n` +
-      `*Prix :* ${priceText}\n` +
-      `*Taille :* ${selectedSize}\n` +
-      (product.colors?.length > 0 ? `*Couleur (Code Hex) :* ${selectedColor}\n` : '') +
-      `*Client :* ${customerName.trim()}\n\n` +
-      `Je souhaite valider cette commande.`
+    const message = `${T.orderHeader}\n\n` +
+      `${T.orderProduct} ${t(product, 'title')}\n` +
+      `${T.orderCategory} ${product.category_name || ''}\n` +
+      `${T.orderPrice} ${priceText}\n` +
+      `${T.orderSize} ${selectedSize}\n` +
+      (product.colors?.length > 0 ? `${T.orderColor} ${selectedColor}\n` : '') +
+      `${T.orderClient} ${customerName.trim()}\n\n` +
+      `${T.orderFooter}`
 
     const url = `https://wa.me/212666780147?text=${encodeURIComponent(message)}`
     window.open(url, '_blank')
@@ -212,10 +260,10 @@ export default function ProductModal({ isOpen, product, onClose }) {
                 className="md:w-1/2 overflow-y-auto p-6 md:p-10 lg:p-12 flex flex-col bg-white modal-scrollbar"
               >
                 <span className="font-accent text-[10px] md:text-xs tracking-[0.3em] text-gold uppercase mb-2 block">
-                  {product.category || product.subtitle}
+                  {product.category_name}
                 </span>
                 <h2 className="font-display text-2xl md:text-3xl lg:text-4xl font-semibold text-charcoal mb-2 leading-tight">
-                  {product.title}
+                  {t(product, 'title')}
                 </h2>
                 <p className="text-lg md:text-xl text-gold-dark font-medium mb-6 md:mb-8">
                   {product.price} {typeof product.price === 'number' ? 'DH' : ''}
@@ -223,9 +271,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
 
                 <div className="prose prose-sm text-smoke mb-8 leading-relaxed">
                   <p>
-                    Une création exceptionnelle alliant tradition marocaine et design contemporain.
-                    Confectionnée avec un soin minutieux par maître artisan Aziz Bousseta dans nos ateliers à Rabat.
-                    Cette pièce sur-mesure est conçue pour sublimer votre allure avec élégance et distinction.
+                    {t(product, 'description')}
                   </p>
                 </div>
 
@@ -234,7 +280,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   {/* Size Choice */}
                   <div>
                     <label className="block font-display text-xs md:text-sm font-bold tracking-widest text-charcoal uppercase mb-3">
-                      Sélectionner la Taille
+                      {T.sizeLabel}
                     </label>
                     <div className="flex flex-wrap gap-2 md:gap-3">
                       {SIZES.map(size => (
@@ -257,7 +303,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   {product.colors && product.colors.length > 0 && (
                     <div>
                       <label className="block font-display text-xs md:text-sm font-bold tracking-widest text-charcoal uppercase mb-3">
-                        Couleur du Modèle
+                        {T.colorLabel}
                       </label>
                       <div className="flex items-center gap-3 md:gap-4 p-1">
                         {product.colors.map(hex => (
@@ -283,13 +329,13 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   {/* Name Capture */}
                   <div>
                     <label className="block font-display text-xs md:text-sm font-bold tracking-widest text-charcoal uppercase mb-3">
-                      Votre Nom Complet
+                      {T.nameLabel}
                     </label>
                     <input
                       type="text"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="Saisissez votre nom..."
+                      placeholder={T.namePlaceholder}
                       className="w-full bg-cream/30 border-2 border-transparent hover:border-sand rounded-xl py-3.5 px-5 text-sm md:text-base font-medium text-charcoal placeholder:text-smoke/60 focus:outline-none focus:border-gold focus:bg-white focus:ring-4 focus:ring-gold/10 transition-all"
                     />
                   </div>
@@ -301,11 +347,11 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   className="w-full flex items-center justify-center gap-2 py-4 md:py-5 rounded-xl bg-charcoal text-white font-bold tracking-[0.2em] uppercase text-xs md:text-sm transition-all hover:bg-gold hover:shadow-[0_4px_20px_rgba(212,168,67,0.3)] hover:-translate-y-1"
                 >
                   <FaWhatsapp className="w-5 h-5 md:w-6 md:h-6" />
-                  <span>Commander l'article</span>
+                  <span>{T.orderBtn}</span>
                 </button>
 
                 <p className="text-center text-[10px] md:text-xs text-smoke mt-4 uppercase tracking-widest">
-                  Paiement à la livraison ou virement
+                  {T.paymentNote}
                 </p>
               </div>
             </motion.div>

@@ -1,11 +1,12 @@
+import { Link, useLocation } from 'react-router-dom'
 import { FaWhatsapp, FaInstagram, FaFacebookF } from 'react-icons/fa'
 
 const FOOTER_LINKS = [
-  { label: 'Accueil', id: 'hero' },
-  { label: 'Collections', id: 'categories' },
-  { label: 'Sur-Mesure', id: 'surmesure' },
-  { label: 'Galerie', id: 'gallery' },
-  { label: 'Contact', id: 'contact' },
+  { label: 'Accueil', path: '/', id: 'hero' },
+  { label: 'Collections', path: '/shop', id: 'collection' },
+  { label: 'Sur-Mesure', path: '/', id: 'surmesure' },
+  { label: 'Galerie', path: '/', id: 'gallery' },
+  { label: 'Contact', path: '/', id: 'contact' },
 ]
 
 const SOCIALS = [
@@ -15,8 +16,15 @@ const SOCIALS = [
 
 export default function Footer() {
   const year = new Date().getFullYear()
+  const location = useLocation()
 
-  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  const handleNav = (l) => {
+    if (location.pathname === '/' && l.id !== 'collection') {
+      document.getElementById(l.id)?.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   return (
     <footer className="bg-charcoal">
@@ -24,15 +32,17 @@ export default function Footer() {
       <div className="h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent" />
 
       <div className="section-container py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-10 lg:gap-12">
           {/* Brand */}
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <div className="mb-4">
-              <span className="font-display text-xl font-bold tracking-[0.18em] text-gold">
-                BOUTIQUE COUTURE
-              </span>
-              <br />
-              <span className="font-accent text-xs tracking-[0.3em] text-gold-light/50">RABAT</span>
+              <Link to="/" onClick={() => window.scrollTo(0,0)}>
+                <span className="font-display text-xl font-bold tracking-[0.18em] text-gold">
+                  BOUTIQUE COUTURE
+                </span>
+                <br />
+                <span className="font-accent text-xs tracking-[0.3em] text-gold-light/50">RABAT</span>
+              </Link>
             </div>
             <p className="text-ivory/35 text-sm leading-relaxed max-w-xs">
               Bespoke Moroccan elegance since generations. Master Tailor Aziz Bousseta crafts luxury
@@ -45,13 +55,14 @@ export default function Footer() {
             <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">Navigation</h4>
             <ul className="space-y-3">
               {FOOTER_LINKS.map((l) => (
-                <li key={l.id}>
-                  <button
-                    onClick={() => scrollTo(l.id)}
+                <li key={l.label}>
+                  <Link
+                    to={l.path}
+                    onClick={() => handleNav(l)}
                     className="text-ivory/35 hover:text-gold text-sm transition-colors"
                   >
                     {l.label}
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -76,6 +87,28 @@ export default function Footer() {
                 WhatsApp
               </a>
             </div>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">Légal</h4>
+            <ul className="space-y-3">
+              <li>
+                <Link to="/legal" className="text-ivory/35 hover:text-gold text-sm transition-colors">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/legal" className="text-ivory/35 hover:text-gold text-sm transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/legal" className="text-ivory/35 hover:text-gold text-sm transition-colors">
+                  License & Copyright
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
 

@@ -1,26 +1,28 @@
 import { motion, useInView } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import ProductModal from './ProductModal'
 import Ornament from './Ornament'
+import { fetchCategories } from '../api'
+import { useLanguage } from '../context/LanguageContext'
 
 import slideBg from '../assets/slide1.jpg'
-import caftansImg from '../assets/caftans.png'
-import djellImg from '../assets/djellabas.png'
-import gandImg from '../assets/gandouras.png'
-import accImg from '../assets/accessories.png'
-import gallery1 from '../assets/gallery1.png'
-import gallery2 from '../assets/gallery2.png'
-import gallery3 from '../assets/gallery3.png'
-import slide3 from '../assets/slide3.jpg'
-import slide4 from '../assets/slide4.jpg'
-import slide5 from '../assets/slide5.jpg'
 
-const COLLECTIONS = [
-  { id: 1, title: 'Haute Couture Caftans', subtitle: 'Majestic elegance', image: caftansImg, images: [caftansImg, slide3, gallery1], price: 'À partir de 3,500 DH', colors: ['#0D6B4B', '#D4A843', '#1A2980'] },
-  { id: 2, title: 'Modern Djellabas', subtitle: 'Contemporary tradition', image: djellImg, images: [djellImg, slide4, gallery2], price: 'À partir de 1,800 DH', colors: ['#E8DDD0', '#C75B39', '#1C1C1E'] },
-  { id: 3, title: 'Elegant Gandouras', subtitle: 'Refined simplicity', image: gandImg, images: [gandImg, slide5, gallery3], price: 'À partir de 1,200 DH', colors: ['#0D6B4B', '#1C1C1E'] },
-  { id: 4, title: 'Accessories', subtitle: 'Finishing touches', image: accImg, images: [accImg], price: 'À partir de 300 DH', colors: ['#D4A843', '#1C1C1E', '#E8DDD0'] },
-]
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+const TRANSLATIONS = {
+  FR: {
+    badge: 'Nos Collections De Luxe',
+    title: <>Caftan & <span className="italic text-gold">Haute Couture</span></>,
+    sub: 'Une collection exclusive de caftans marocains et djellabas haut de gamme.',
+    discover: 'Découvrir'
+  },
+  EN: {
+    badge: 'Our Luxury Collections',
+    title: <>Caftan & <span className="italic text-gold">Haute Couture</span></>,
+    sub: 'An exclusive collection of premium Moroccan caftans and luxury djellabas.',
+    discover: 'Discover'
+  }
+}
 
 function WhatsAppIcon({ className = 'w-4 h-4' }) {
   return (
@@ -34,15 +36,24 @@ export default function Categories() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [collections, setCollections] = useState([])
+  const { lang, t } = useLanguage()
+  const T = TRANSLATIONS[lang]
+
+  useEffect(() => {
+    fetchCategories()
+      .then(data => setCollections(data))
+      .catch(err => console.error('Error fetching categories:', err))
+  }, [])
 
   return (
     <section id="categories" className="relative py-16 md:py-24 overflow-hidden bg-ivory">
       {/* ── Parallax Background Responsive Switch ── */}
-      <div 
+      <div
         className="absolute inset-0 w-full h-full bg-fixed bg-cover bg-top opacity-15 mix-blend-multiply block md:hidden"
         style={{ backgroundImage: `url(${slideBg})` }}
       />
-      <div 
+      <div
         className="absolute inset-0 w-full h-full bg-fixed bg-cover bg-center opacity-15 mix-blend-multiply hidden md:block"
         style={{ backgroundImage: `url(${slideBg})` }}
       />
@@ -56,74 +67,75 @@ export default function Categories() {
           transition={{ duration: 0.7 }}
           className="text-center mb-12 md:mb-16"
         >
-          <p className="font-accent text-sm tracking-[0.4em] text-gold uppercase mb-2">Our Collections</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-charcoal font-semibold mb-4">
-            Nos <span className="italic text-gold-dark">Créations</span>
+          <p className="font-accent text-sm tracking-[0.4em] text-gold uppercase mb-2">{T.badge}</p>
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-charcoal font-semibold mb-4">
+            {T.title}
           </h2>
           <Ornament icon="◆" />
-          <p className="font-accent text-base md:text-lg text-smoke mt-4 max-w-lg mx-auto leading-relaxed">
-            Chaque pièce est une œuvre d'art, confectionnée avec passion et savoir-faire
+          <p className="font-accent text-base md:text-lg text-smoke max-w-xl mx-auto leading-relaxed">
+            {T.sub}
           </p>
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 lg:gap-12">
-          {COLLECTIONS.map((item, i) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 40 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.55, delay: i * 0.12 }}
-              className="group flex flex-col h-full rounded-2xl overflow-hidden bg-white border border-gold/10 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:border-gold/30 hover:shadow-[0_20px_40px_rgba(212,168,67,0.15)] transition-all duration-500"
-            >
-              {/* Image Container */}
-              <div 
-                className="w-full shrink-0 relative aspect-[4/5] overflow-hidden cursor-pointer"
-                onClick={() => setSelectedProduct(item)}
+          {collections.map((item, i) => {
+            const imageUrl = item.image?.startsWith('http')
+              ? item.image
+              : `${API_URL}/uploads/${item.image}`
+
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 40 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.55, delay: i * 0.12 }}
+                className="group flex flex-col h-full rounded-2xl overflow-hidden bg-white border border-gold/10 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:border-gold/30 hover:shadow-[0_20px_40px_rgba(212,168,67,0.15)] transition-all duration-500"
               >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-
-              {/* Text */}
-              <div className="flex flex-col flex-1 p-3 pt-0 md:p-5 md:pt-0 lg:p-6 lg:pt-0 relative z-10">
-                <div className="mb-auto">
-                  <p className="font-accent text-[9px] md:text-[11px] tracking-[0.25em] text-gold-dark/70 uppercase mb-1.5 md:mb-2 line-clamp-1">
-                    {item.subtitle}
-                  </p>
-                  <h3 className="font-display text-sm sm:text-lg md:text-xl text-charcoal font-semibold leading-snug mb-2 md:mb-3 text-balance">
-                    {item.title}
-                  </h3>
-                  <p className="text-gold-dark text-xs sm:text-sm font-medium">{item.price}</p>
-                  {item.colors && item.colors.length > 0 && (
-                    <div className="flex items-center gap-1.5 mt-2 md:mt-3">
-                      {item.colors.map(hex => (
-                        <div key={hex} className="w-3 h-3 md:w-4 md:h-4 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: hex }} />
-                      ))}
-                    </div>
-                  )}
+                {/* Image Container */}
+                <div
+                  className="w-full shrink-0 relative aspect-[4/5] overflow-hidden cursor-pointer"
+                  onClick={() => setSelectedProduct(item)}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={item.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
                 </div>
 
-                <div className="mt-3 md:mt-5">
-                  <button
-                    onClick={() => setSelectedProduct(item)}
-                    className="w-full flex items-center justify-center gap-1.5 md:gap-2 py-2.5 md:py-3 rounded-xl border-2 border-charcoal/80 text-charcoal text-[11px] sm:text-xs font-bold tracking-[0.15em] uppercase transition-all duration-300 hover:border-gold hover:bg-gold hover:text-white hover:shadow-[0_4px_15px_rgba(212,168,67,0.3)]"
-                  >
-                    <span>Découvrir</span>
-                  </button>
+                {/* Text */}
+                <div className="flex flex-col flex-1 p-3 pt-0 md:p-5 md:pt-0 lg:p-6 lg:pt-0 relative z-10">
+                  <div className="mb-auto">
+                    <p className="font-accent text-[9px] md:text-[11px] tracking-[0.25em] text-gold-dark/70 uppercase mb-1.5 md:mb-2 line-clamp-1">
+                      {item.name}
+                    </p>
+                    <h3 className="font-display text-xl md:text-2xl text-charcoal font-semibold mb-2 group-hover:text-gold transition-colors">
+                      {t(item, 'name')}
+                    </h3>
+                    <p className="text-sm text-smoke line-clamp-2 mb-6">
+                      {t(item, 'description')}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 md:mt-5">
+                    <button
+                      onClick={() => setSelectedProduct(item)}
+                      className="w-full flex items-center justify-center gap-1.5 md:gap-2 py-2.5 md:py-3 rounded-xl border-2 border-charcoal/80 text-charcoal text-[11px] sm:text-xs font-bold tracking-[0.15em] uppercase transition-all duration-300 hover:border-gold hover:bg-gold hover:text-white hover:shadow-[0_4px_15px_rgba(212,168,67,0.3)]"
+                    >
+                      <span>{T.discover}</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            )
+          })}
         </div>
       </div>
 
-      <ProductModal 
-        isOpen={!!selectedProduct} 
-        product={selectedProduct} 
-        onClose={() => setSelectedProduct(null)} 
+      <ProductModal
+        isOpen={!!selectedProduct}
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
       />
     </section>
   )

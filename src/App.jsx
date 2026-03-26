@@ -1,38 +1,23 @@
-import { useState } from 'react'
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
-import Categories from './components/Categories'
-import SurMesure from './components/SurMesure'
-import Gallery from './components/Gallery'
-import Contact from './components/Contact'
-import Footer from './components/Footer'
-import WhatsAppButton from './components/WhatsAppButton'
-import ShopCollection from './components/ShopCollection'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import MainLayout from './components/Layout/MainLayout'
+import Home from './pages/Home'
+import Shop from './pages/Shop'
+import Legal from './pages/Legal'
+import AdminDashboard from './pages/Admin/AdminDashboard'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home') // 'home' or 'collection'
-
   return (
-    <div className="min-h-screen bg-ivory relative w-full overflow-x-hidden">
-      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      
-      <main>
-        {currentPage === 'home' ? (
-          <>
-            <Hero />
-            <Categories />
-            <SurMesure />
-            <Gallery />
-            <Contact />
-          </>
-        ) : (
-          <ShopCollection />
-        )}
-      </main>
-      
-      <Footer />
-      <WhatsAppButton />
-    </div>
+    <Router>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+        <Route path="/shop" element={<MainLayout><Shop /></MainLayout>} />
+        <Route path="/legal" element={<MainLayout><Legal /></MainLayout>} />
+        
+        {/* Admin Route (Still discreet - not in nav) */}
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Routes>
+    </Router>
   )
 }
 
