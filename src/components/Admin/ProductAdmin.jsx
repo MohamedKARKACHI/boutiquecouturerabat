@@ -267,17 +267,16 @@ export default function ProductAdmin() {
                   
                   {/* New Gallery Previews */}
                   {formData.gallery.map((file, idx) => (
-                    <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border-2 border-gold/30 group shadow-sm bg-gold/5 flex flex-col items-center justify-center p-2">
+                    <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border-2 border-gold/30 shadow-sm bg-gold/5 flex flex-col items-center justify-center p-2">
                        <img src={URL.createObjectURL(file)} className="absolute inset-0 w-full h-full object-cover opacity-60" />
-                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-charcoal/60">
-                         <button 
-                          type="button"
-                          onClick={() => setFormData({...formData, gallery: formData.gallery.filter((_, i) => i !== idx)})}
-                          className="text-white transform hover:scale-125 transition-transform"
-                         >
-                          <HiTrash className="w-5 h-5" />
-                         </button>
-                       </div>
+                       <button 
+                        type="button"
+                        onClick={() => setFormData({...formData, gallery: formData.gallery.filter((_, i) => i !== idx)})}
+                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow-lg hover:scale-110 transition-transform z-20"
+                        title="Supprimer"
+                       >
+                        <HiX className="w-3 h-3" />
+                       </button>
                        <span className="relative z-10 text-[8px] font-bold text-charcoal bg-gold px-1.5 rounded-full uppercase">NOUVEAU</span>
                     </div>
                   ))}

@@ -116,9 +116,9 @@ export default function Hero() {
           className="font-display text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-tight mb-4 md:mb-6 max-w-4xl mx-auto text-balance"
         >
           {lang === 'FR' ? (
-            <>L’<span className="text-gold">Élégance</span> du Caftan Marocain <span className="font-accent italic text-white/90">Authentique</span></>
+            <>L’<span className="shimmer-text">Élégance</span> du Caftan Marocain <span className="font-accent italic text-white/90">Authentique</span></>
           ) : (
-            <>Authentic Moroccan <span className="text-gold">Elegance</span>, Tailored to <span className="font-accent italic text-white/90">You</span></>
+            <>Authentic Moroccan <span className="shimmer-text">Elegance</span>, Tailored to <span className="font-accent italic text-white/90">You</span></>
           )}
         </motion.h1>
 
@@ -129,7 +129,11 @@ export default function Hero() {
           transition={{ duration: 0.9, delay: 0.7 }}
           className="font-accent text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-6 md:mb-8 leading-relaxed text-balance"
         >
-          {T.subtitle}
+          {lang === 'FR' ? (
+            <>Haute Couture & Créations Sur-Mesure par <span className="shimmer-text px-1">Aziz Bousseta</span></>
+          ) : (
+            <>Bespoke traditional wear crafted by Master Tailor <span className="shimmer-text px-1">Aziz Bousseta</span> in the heart of Marrakech.</>
+          )}
         </motion.p>
 
         {/* CTA */}

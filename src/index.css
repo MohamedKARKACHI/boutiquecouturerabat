@@ -152,17 +152,18 @@ img {
 }
 
 .shimmer-text {
-  background: linear-gradient(90deg,
-      var(--color-gold-dark),
-      var(--color-gold-light),
-      var(--color-gold-dark),
-      var(--color-gold-light),
-      var(--color-gold-dark));
+  background: linear-gradient(
+    90deg,
+    #D4A843 0%,
+    #F1D38E 50%,
+    #D4A843 100%
+  );
   background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: shimmer 4s linear infinite;
+  animation: shimmer 3.5s linear infinite;
+  display: inline-block;
 }
 
 /* ═══════════════════════════════════════
