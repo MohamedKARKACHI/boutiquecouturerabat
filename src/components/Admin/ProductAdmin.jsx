@@ -196,24 +196,99 @@ export default function ProductAdmin() {
             </div>
             
             {/* Image Uploads */}
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-smoke">Image Principale</label>
-                <input 
-                  type="file" 
-                  onChange={e => setFormData({...formData, image: e.target.files[0]})}
-                  className="text-sm"
-                />
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8 bg-cream/20 p-6 rounded-3xl border border-sand">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold uppercase tracking-widest text-smoke">Image Principale</label>
+                </div>
+                <div className="relative group">
+                  <input 
+                    type="file" 
+                    id="main-image-upload"
+                    className="hidden"
+                    onChange={e => setFormData({...formData, image: e.target.files[0]})}
+                  />
+                  <label 
+                    htmlFor="main-image-upload"
+                    className="flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-sand rounded-2xl cursor-pointer hover:border-gold hover:bg-gold/5 transition-all overflow-hidden"
+                  >
+                    {formData.image || (formData.id && !formData.image) ? (
+                      <img 
+                        src={formData.image ? URL.createObjectURL(formData.image) : `${API_URL}/uploads/${products.find(p=>p.id===formData.id)?.main_image}`} 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-smoke">
+                        <HiPlus className="w-8 h-8 opacity-40" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Cliquer pour choisir</span>
+                      </div>
+                    )}
+                  </label>
+                </div>
               </div>
               
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-smoke">Galerie d'images (Multi-select)</label>
-                <input 
-                  type="file" 
-                  multiple
-                  onChange={e => setFormData({...formData, gallery: Array.from(e.target.files)})}
-                  className="text-sm"
-                />
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold uppercase tracking-widest text-smoke">Galerie d'images</label>
+                  <label htmlFor="gallery-upload" className="flex items-center gap-2 text-gold hover:text-charcoal transition-colors cursor-pointer">
+                    <HiPlus className="w-5 h-5" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">Ajouter</span>
+                  </label>
+                  <input 
+                    type="file" 
+                    id="gallery-upload"
+                    multiple
+                    className="hidden"
+                    onChange={e => setFormData({...formData, gallery: [...formData.gallery, ...Array.from(e.target.files)]})}
+                  />
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 bg-white/50 p-4 rounded-2xl min-h-[120px] border border-sand/50">
+                  {/* Current Gallery Previews (Existing) */}
+                  {formData.existingGallery.map((img, idx) => (
+                    <div key={`existing-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-sand group shadow-sm bg-white">
+                      <img src={`${API_URL}/uploads/${img}`} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-red-500/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              existingGallery: formData.existingGallery.filter(g => g !== img),
+                              removeImages: [...formData.removeImages, img]
+                            })
+                          }}
+                          className="text-white transform hover:scale-125 transition-transform"
+                        >
+                          <HiTrash className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {/* New Gallery Previews */}
+                  {formData.gallery.map((file, idx) => (
+                    <div key={`new-${idx}`} className="relative aspect-square rounded-xl overflow-hidden border-2 border-gold/30 group shadow-sm bg-gold/5 flex flex-col items-center justify-center p-2">
+                       <img src={URL.createObjectURL(file)} className="absolute inset-0 w-full h-full object-cover opacity-60" />
+                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-charcoal/60">
+                         <button 
+                          type="button"
+                          onClick={() => setFormData({...formData, gallery: formData.gallery.filter((_, i) => i !== idx)})}
+                          className="text-white transform hover:scale-125 transition-transform"
+                         >
+                          <HiTrash className="w-5 h-5" />
+                         </button>
+                       </div>
+                       <span className="relative z-10 text-[8px] font-bold text-charcoal bg-gold px-1.5 rounded-full uppercase">NOUVEAU</span>
+                    </div>
+                  ))}
+
+                  {/* Empty state plus button */}
+                  {formData.gallery.length === 0 && formData.existingGallery.length === 0 && (
+                    <label htmlFor="gallery-upload" className="col-span-full flex flex-col items-center justify-center gap-2 text-smoke/40 cursor-pointer">
+                       <HiPlus className="w-10 h-10 border-2 border-dashed border-sand rounded-xl p-2" />
+                    </label>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -228,37 +303,7 @@ export default function ProductAdmin() {
               </label>
             </div>
 
-             {/* Gallery Preview */}
-             {(formData.existingGallery.length > 0 || formData.gallery.length > 0) && (
-              <div className="md:col-span-2">
-                <label className="text-xs font-bold uppercase tracking-widest text-smoke mb-3 block">Images sélectionnées</label>
-                <div className="grid grid-cols-4 sm:grid-cols-6 gap-4">
-                  {formData.existingGallery.map((img, idx) => (
-                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-sand group">
-                      <img src={`${API_URL}/uploads/${img}`} className="w-full h-full object-cover" />
-                      <button 
-                        type="button"
-                        onClick={() => {
-                          setFormData({
-                            ...formData,
-                            existingGallery: formData.existingGallery.filter(g => g !== img),
-                            removeImages: [...formData.removeImages, img]
-                          })
-                        }}
-                        className="absolute top-1 right-1 bg-red-400 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <HiTrash className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
-                  {formData.gallery.map((file, idx) => (
-                    <div key={`new-${idx}`} className="relative aspect-square rounded-lg overflow-hidden border border-gold group bg-gold/5 flex items-center justify-center p-2 text-[10px] text-gold font-bold">
-                       NOUVEAU
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/* Gallery Preview removed as it's now integrated above */}
 
             <div className="md:col-span-2 flex justify-end gap-3 mt-4">
               <button 
