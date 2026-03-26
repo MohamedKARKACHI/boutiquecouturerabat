@@ -100,15 +100,15 @@ export default function Hero() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="mb-4 md:mb-6 w-full flex flex-col items-center gap-3"
+          className="mb-6 md:mb-8 w-full flex flex-col items-center gap-4"
         >
-          {/* Vertical Ornament: Star above Dot */}
-          <div className="flex flex-col items-center gap-3 text-gold">
-            <span className="text-xl leading-none">✦</span>
-            <div className="w-1.5 h-1.5 rotate-45 bg-gold shadow-[0_0_8px_rgba(212,168,67,0.4)]" />
+          {/* Vertical Ornament: Star above Dot (Centered Stack) */}
+          <div className="flex flex-col items-center gap-4 text-gold">
+            <span className="text-2xl leading-none">✦</span>
+            <div className="w-2 h-2 rotate-45 bg-gold shadow-[0_0_12px_rgba(212,168,67,0.5)]" />
           </div>
           
-          <div className="relative font-accent text-[11px] md:text-sm uppercase text-gold tracking-[0.5em] font-medium mt-2">
+          <div className="relative font-accent text-xs md:text-sm uppercase text-gold tracking-[0.6em] font-medium mt-1">
             {T.location}
           </div>
         </motion.div>

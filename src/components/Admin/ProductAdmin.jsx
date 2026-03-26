@@ -99,13 +99,14 @@ export default function ProductAdmin() {
         setIsEditing(false)
         setFormData({ id: null, title: '', title_en: '', slug: '', price: '', category_id: '', description: '', description_en: '', in_stock: true, is_featured: false, image: null, gallery: [], existingGallery: [], removeImages: [] })
         await loadData()
+        alert('Produit enregistré avec succès !')
       } else {
         const errData = await resp.json()
         alert(`Error: ${errData.error || 'Server error'}`)
       }
     } catch (err) { 
       console.error(err)
-      alert('Network Error: Could not connect to server')
+      alert(`Network Error: ${err.message}`)
     } finally {
       setIsSubmitting(false)
     }
@@ -221,13 +222,26 @@ export default function ProductAdmin() {
                   />
                   <label 
                     htmlFor="main-image-upload"
-                    className="flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-sand rounded-2xl cursor-pointer hover:border-gold hover:bg-gold/5 transition-all overflow-hidden"
+                    className="relative flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-sand rounded-2xl cursor-pointer hover:border-gold hover:bg-gold/5 transition-all overflow-hidden bg-white"
                   >
                     {formData.image || (formData.id && !formData.image) ? (
-                      <img 
-                        src={formData.image ? URL.createObjectURL(formData.image) : `${API_URL}/uploads/${products.find(p=>p.id===formData.id)?.main_image}`} 
-                        className="w-full h-full object-cover" 
-                      />
+                      <>
+                        <img 
+                          src={formData.image ? URL.createObjectURL(formData.image) : `${API_URL}/uploads/${products.find(p=>p.id===formData.id)?.main_image}`} 
+                          className="w-full h-full object-cover" 
+                        />
+                        <button 
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setFormData({...formData, image: null});
+                          }}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:scale-110 transition-transform z-20"
+                          title="Supprimer"
+                        >
+                          <HiX className="w-4 h-4" />
+                        </button>
+                      </>
                     ) : (
                       <div className="flex flex-col items-center gap-2 text-smoke">
                         <HiPlus className="w-8 h-8 opacity-40" />
