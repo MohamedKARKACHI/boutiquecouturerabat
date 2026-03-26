@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { useRef } from 'react'
 import { HiX, HiChevronLeft, HiChevronRight } from 'react-icons/hi'
+import Ornament from './Ornament'
 
 import gallery1 from '../assets/gallery1.png'
 import gallery2 from '../assets/gallery2.png'
@@ -44,7 +44,7 @@ export default function Gallery() {
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-charcoal font-semibold mb-4">
             Notre <span className="italic text-majorelle">Galerie</span>
           </h2>
-          <div className="ornament"><span className="text-gold">◆</span></div>
+          <Ornament icon="◆" />
         </motion.div>
 
         {/* ── Grid ── */}

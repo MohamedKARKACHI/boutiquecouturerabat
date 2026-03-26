@@ -1,6 +1,7 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { HiOutlineChat, HiOutlineScissors, HiOutlineGlobe } from 'react-icons/hi'
+import Ornament from './Ornament'
 
 /* ── Data constant ── */
 const STEPS = [
@@ -74,7 +75,7 @@ export default function SurMesure() {
           <p className="font-accent text-base md:text-lg text-smoke max-w-xl mx-auto leading-relaxed">
             De votre vision à votre garde-robe — une expérience sur-mesure sans faille
           </p>
-          <div className="ornament mt-5"><span className="text-gold">✦</span></div>
+          <Ornament className="mt-5" />
         </motion.div>
 
         {/* ── Cards ── */}

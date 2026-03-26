@@ -1,6 +1,7 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef, useState } from 'react'
 import ProductModal from './ProductModal'
+import Ornament from './Ornament'
 
 import slideBg from '../assets/slide1.jpg'
 import caftansImg from '../assets/caftans.png'
@@ -59,7 +60,7 @@ export default function Categories() {
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-charcoal font-semibold mb-4">
             Nos <span className="italic text-gold-dark">Créations</span>
           </h2>
-          <div className="ornament"><span className="text-gold">◆</span></div>
+          <Ornament icon="◆" />
           <p className="font-accent text-base md:text-lg text-smoke mt-4 max-w-lg mx-auto leading-relaxed">
             Chaque pièce est une œuvre d'art, confectionnée avec passion et savoir-faire
           </p>

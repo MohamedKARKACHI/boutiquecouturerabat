@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
+import Ornament from './Ornament'
 
 import slide1 from '../assets/slide1.jpg' // Landscape
 import slide2 from '../assets/slide2.jpg' // Landscape
@@ -34,19 +35,19 @@ export default function Hero() {
 
   const activeSlides = isMobile ? mobileSlides : desktopSlides
 
+  // Handle slide interval and index reset
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % activeSlides.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [activeSlides.length])
-
-  // Reset index if it goes out of bounds when switching arrays
-  useEffect(() => {
+    // Reset if index is invalid for current array
     if (current >= activeSlides.length) {
       setCurrent(0)
     }
-  }, [isMobile, current, activeSlides.length])
+
+    const timer = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % activeSlides.length)
+    }, 5000)
+
+    return () => clearInterval(timer)
+  }, [activeSlides.length, current])
 
   return (
     <section
@@ -84,9 +85,7 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.2 }}
           className="mb-4 md:mb-6 w-full flex flex-col items-center"
         >
-          <div className="ornament mb-3 w-full">
-            <span className="text-gold text-xl leading-none">✦</span>
-          </div>
+          <Ornament className="mb-3 w-full" />
           <div className="relative flex items-center justify-center font-accent text-[10px] md:text-sm uppercase text-gold-light/80 w-full h-4 md:h-5">
             <span className="absolute right-1/2 mr-2 md:mr-3 tracking-[0.4em]">MARRAKECH</span>
             <span className="absolute left-1/2 -translate-x-1/2 opacity-80">·</span>

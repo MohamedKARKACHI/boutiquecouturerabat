@@ -1,6 +1,7 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { HiOutlineLocationMarker, HiOutlineClock, HiOutlinePhone } from 'react-icons/hi'
+import Ornament from './Ornament'
 
 /* ── Data constant ── */
 const INFO_CARDS = [
@@ -43,7 +44,7 @@ export default function Contact() {
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-charcoal font-semibold mb-4">
             Nous <span className="italic text-majorelle">Trouver</span>
           </h2>
-          <div className="ornament"><span className="text-gold">◆</span></div>
+          <Ornament icon="◆" />
         </motion.div>
 
         {/* ── 2-column layout ── */}
