@@ -24,8 +24,8 @@ const TRANSLATIONS = {
   },
   EN: {
     location: 'MARRAKECH · MOROCCO',
-    title: "Authentic Moroccan Caftan & Haute Couture",
-    subtitle: "Bespoke Luxury Creations by Master Tailor Aziz Bousseta",
+    title: "Authentic Moroccan Elegance, Tailored to You",
+    subtitle: "Bespoke traditional wear crafted by Master Tailor Aziz Bousseta in the heart of Marrakech.",
     cta: "Explore Collection"
   }
 }
@@ -102,8 +102,8 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.2 }}
           className="mb-4 md:mb-6 w-full flex flex-col items-center"
         >
-          <Ornament className="mb-3 w-full" />
-          <div className="relative flex items-center justify-center font-accent text-[10px] md:text-sm uppercase text-gold-light/80 w-full h-4 md:h-5 tracking-[0.4em]">
+          <Ornament className="mb-4" />
+          <div className="relative flex items-center justify-center font-accent text-[11px] md:text-sm uppercase text-gold tracking-[0.5em] font-medium">
             {T.location}
           </div>
         </motion.div>
@@ -115,7 +115,11 @@ export default function Hero() {
           transition={{ duration: 0.9, delay: 0.45 }}
           className="font-display text-4xl sm:text-5xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold text-white leading-tight mb-4 md:mb-6 max-w-4xl mx-auto text-balance"
         >
-          {T.title}
+          {lang === 'FR' ? (
+            <>L’<span className="text-gold">Élégance</span> du Caftan Marocain <span className="font-accent italic text-white/90">Authentique</span></>
+          ) : (
+            <>Authentic Moroccan <span className="text-gold">Elegance</span>, Tailored to <span className="font-accent italic text-white/90">You</span></>
+          )}
         </motion.h1>
 
         {/* Sub */}
