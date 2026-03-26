@@ -27,6 +27,7 @@ export default function ProductAdmin() {
   })
   const [deleteId, setDeleteId] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     loadData()
@@ -34,10 +35,14 @@ export default function ProductAdmin() {
 
   const loadData = async () => {
     try {
-      const [p, c] = await Promise.all([fetchProducts(), fetchCategories()])
-      setProducts(p)
-      setCategories(c)
-    } catch (err) { console.error(err) }
+      const [prods, cats] = await Promise.all([fetchProducts(), fetchCategories()])
+      setProducts(prods)
+      setCategories(cats)
+      setError(null)
+    } catch (err) {
+      console.error(err)
+      setError("Impossible de charger les données. Vérifiez la connexion au serveur API.")
+    }
   }
 
   const handleEdit = async (p) => {
