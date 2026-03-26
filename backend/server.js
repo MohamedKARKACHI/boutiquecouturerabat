@@ -10,7 +10,13 @@ const app = express();
 
 // Middleware
 const corsOptions = {
-  origin: ['http://localhost:5173', 'http://localhost:5174', /\.vercel\.app$/],
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    /\.vercel\.app$/,
+    'https://www.boutiquecouturerabat.me',
+    'https://boutiquecouturerabat.me'
+  ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
   optionsSuccessStatus: 204
