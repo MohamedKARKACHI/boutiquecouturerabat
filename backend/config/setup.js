@@ -4,17 +4,22 @@ const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const setupDatabase = async () => {
-  const connection = await mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-  });
-
-  try {
+  let connection;
+  if (process.env.JAWSDB_URL) {
+    // On Heroku, JAWSDB_URL is provided and we don't need to create the database
+    connection = await mysql.createConnection(process.env.JAWSDB_URL);
+  } else {
+    connection = await mysql.createConnection({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+    });
     // 1. Create database if not exists
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\`;`);
     await connection.query(`USE \`${process.env.DB_NAME}\`;`);
-
+  }
+  
+  try {
     // 2. Check if tables exist
     const [tables] = await connection.query('SHOW TABLES');
     

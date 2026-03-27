@@ -2,6 +2,9 @@
   "name": "boussete-couture",
   "private": true,
   "version": "0.0.0",
+  "engines": {
+    "node": "18.x"
+  },
   "workspaces": [
     "frontend",
     "backend"

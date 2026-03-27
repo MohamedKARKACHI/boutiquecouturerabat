@@ -9,19 +9,9 @@ setupDatabase();
 const app = express();
 
 // Middleware
-const corsOptions = {
-  origin: [
-    'http://localhost:5173', 
-    'http://localhost:5174', 
-    /\.vercel\.app$/,
-    'https://www.boutiquecouturerabat.me',
-    'https://boutiquecouturerabat.me'
-  ],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204
-};
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: "https://your-vercel-app.vercel.app"
+}));
 app.use(express.json());
 app.use('/uploads', express.static('public/uploads'));
 
@@ -49,7 +39,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
