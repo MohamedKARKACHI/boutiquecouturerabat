@@ -12,6 +12,8 @@ const app = express();
 const allowedOrigins = [
   'https://boutiquecouturerabat.vercel.app',
   'https://boutique-couture-rabat.vercel.app',
+  'https://www.boutiquecouturerabat.me',
+  'https://boutiquecouturerabat.me',
   'http://localhost:5173',
   'http://localhost:3000'
 ];
