@@ -275,7 +275,7 @@ export default function ShopCollection() {
                       onClick={() => setSelectedProduct(p)}
                     >
                       <img
-                        src={`${API_URL}/uploads/${p.main_image}`}
+                        src={`/uploads/${p.main_image}`}
                         alt={t(p, 'title')}
                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
