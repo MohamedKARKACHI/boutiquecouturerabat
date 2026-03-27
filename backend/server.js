@@ -9,8 +9,22 @@ setupDatabase();
 const app = express();
 
 // Middleware
+const allowedOrigins = [
+  'https://boutiquecouturerabat.vercel.app',
+  'https://boutique-couture-rabat.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
 app.use(cors({
-  origin: "https://your-vercel-app.vercel.app"
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
 app.use(express.json());
 app.use('/uploads', express.static('public/uploads'));
