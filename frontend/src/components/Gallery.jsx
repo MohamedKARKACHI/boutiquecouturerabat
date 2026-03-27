@@ -63,7 +63,7 @@ export default function Gallery() {
           {galleryItems.map((item, i) => {
             const imageUrl = item.image_path.startsWith('http')
               ? item.image_path
-              : `/uploads/${item.image_path}`
+              : `${API_URL}/uploads/${item.image_path}`
 
             return (
               <motion.div

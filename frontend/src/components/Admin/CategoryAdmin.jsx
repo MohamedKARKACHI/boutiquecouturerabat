@@ -67,7 +67,7 @@ export default function CategoryAdmin() {
         {categories.map(c => (
           <div key={c.id} className="bg-white p-6 rounded-3xl shadow-sm border border-sand flex items-center gap-4 group">
             <div className="w-16 h-16 rounded-2xl overflow-hidden bg-cream shrink-0">
-               <img src={`/uploads/${c.image}`} alt="" className="w-full h-full object-cover" />
+               <img src={`${API_URL}/uploads/${c.image}`} alt="" className="w-full h-full object-cover" />
             </div>
             <div className="flex-1">
               <h4 className="font-bold text-charcoal">{c.name}</h4>

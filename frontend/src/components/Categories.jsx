@@ -81,7 +81,7 @@ export default function Categories() {
           {collections.map((item, i) => {
             const imageUrl = item.image?.startsWith('http')
               ? item.image
-              : `/uploads/${item.image}`
+              : `${API_URL}/uploads/${item.image}`
 
             return (
               <motion.div

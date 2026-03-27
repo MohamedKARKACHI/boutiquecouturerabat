@@ -71,10 +71,10 @@ export default function ProductModal({ isOpen, product, onClose }) {
 
   let images = []
   if (product?.images && product.images.length > 0) {
-    images = product.images.map(img => img.startsWith('http') ? img : `/uploads/${img}`)
+    images = product.images.map(img => img.startsWith('http') ? img : `${API_URL}/uploads/${img}`)
   } else if (product?.main_image || product?.image) {
     const mainImg = product.main_image || product.image
-    images = [mainImg.startsWith('http') ? mainImg : `/uploads/${mainImg}`]
+    images = [mainImg.startsWith('http') ? mainImg : `${API_URL}/uploads/${mainImg}`]
   }
 
   useEffect(() => {

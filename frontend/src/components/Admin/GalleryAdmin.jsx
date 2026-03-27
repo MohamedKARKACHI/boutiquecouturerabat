@@ -64,7 +64,7 @@ export default function GalleryAdmin() {
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
         {items.map(item => (
           <div key={item.id} className="relative aspect-square rounded-2xl overflow-hidden group">
-            <img src={`/uploads/${item.image_path}`} alt="" className="w-full h-full object-cover" />
+            <img src={`${API_URL}/uploads/${item.image_path}`} alt="" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <button 
                 onClick={() => setDeleteId(item.id)} 

@@ -232,7 +232,7 @@ export default function ProductAdmin() {
                     {formData.image || (formData.id && !formData.image) ? (
                       <>
                         <img 
-                          src={formData.image ? URL.createObjectURL(formData.image) : `/uploads/${products.find(p=>p.id===formData.id)?.main_image}`} 
+                          src={formData.image ? URL.createObjectURL(formData.image) : `${API_URL}/uploads/${products.find(p=>p.id===formData.id)?.main_image}`} 
                           className="w-full h-full object-cover" 
                         />
                         <button 
@@ -276,7 +276,7 @@ export default function ProductAdmin() {
                   {/* Current Gallery Previews (Existing) */}
                   {formData.existingGallery.map((img, idx) => (
                     <div key={`existing-${img.id || idx}`} className="relative aspect-square rounded-xl overflow-hidden border border-sand group shadow-sm bg-white">
-                      <img src={`/uploads/${img.path}`} className="w-full h-full object-cover" />
+                      <img src={`${API_URL}/uploads/${img.path}`} className="w-full h-full object-cover" />
                       <div className="absolute inset-0 bg-red-500/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button 
                           type="button"
@@ -376,7 +376,7 @@ export default function ProductAdmin() {
                 <td className="p-5">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-16 rounded-lg overflow-hidden bg-cream shrink-0">
-                      <img src={`/uploads/${p.main_image}`} alt="" className="w-full h-full object-cover" />
+                      <img src={`${API_URL}/uploads/${p.main_image}`} alt="" className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <h4 className="font-bold text-charcoal">{p.title}</h4>
