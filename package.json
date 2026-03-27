@@ -13,7 +13,8 @@
     "dev": "npm run dev --workspace=frontend",
     "build": "npm run build --workspace=frontend",
     "start": "npm start --workspace=backend",
-    "heroku-prebuild": "npm install --workspace=backend"
+    "heroku-prebuild": "npm install --workspace=backend",
+    "heroku-postbuild": "echo 'Skipping frontend build on Heroku'"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.2",
