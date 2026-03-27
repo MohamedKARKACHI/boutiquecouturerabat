@@ -3,7 +3,7 @@ import { HiPlus, HiPencilAlt, HiTrash } from 'react-icons/hi'
 import { fetchCategories } from '../../api'
 import ConfirmationModal from './ConfirmationModal'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 export default function CategoryAdmin() {
   const [categories, setCategories] = useState([])

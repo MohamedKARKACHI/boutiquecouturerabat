@@ -7,7 +7,7 @@ import { useLanguage } from '../context/LanguageContext'
 
 import slideBg from '../assets/slide1.jpg'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const TRANSLATIONS = {
   FR: {

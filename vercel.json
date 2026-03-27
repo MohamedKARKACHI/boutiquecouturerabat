@@ -1,4 +1,9 @@
 {
   "buildCommand": "npm run build --workspace=frontend",
-  "outputDirectory": "frontend/dist"
+  "outputDirectory": "frontend/dist",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "https://boutique-couture-rabat-f78c408cac9c.herokuapp.com/api/$1" },
+    { "source": "/uploads/(.*)", "destination": "https://boutique-couture-rabat-f78c408cac9c.herokuapp.com/uploads/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

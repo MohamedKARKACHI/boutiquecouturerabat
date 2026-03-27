@@ -5,7 +5,7 @@ import Ornament from './Ornament'
 import { fetchGallery } from '../api'
 import { useLanguage } from '../context/LanguageContext'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 const TRANSLATIONS = {
   FR: {
