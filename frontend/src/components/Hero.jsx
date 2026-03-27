@@ -102,11 +102,7 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.2 }}
           className="mb-8 md:mb-10 w-full flex flex-col items-center gap-5"
         >
-          {/* Symmetrical Vertical Ornament Stack */}
-          <div className="flex flex-col items-center gap-4 text-gold">
-            <span className="text-2xl leading-none opacity-90 drop-shadow-gold">✦</span>
-            <div className="w-1.5 h-1.5 rotate-45 bg-gold shadow-[0_0_15px_rgba(212,168,67,0.6)]" />
-          </div>
+          <Ornament icon="✦" className="drop-shadow-gold" />
           
           <div className="relative font-accent text-xs md:text-sm uppercase text-gold tracking-[0.7em] font-medium mt-1">
             {T.location}
