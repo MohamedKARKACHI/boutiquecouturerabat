@@ -65,7 +65,7 @@ export default function Categories() {
           <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-charcoal font-semibold mb-4">
             {T.title}
           </h2>
-          <Ornament icon="◆" />
+          <Ornament />
           <p className="font-accent text-base md:text-lg text-smoke max-w-xl mx-auto leading-relaxed">
             {T.sub}
           </p>

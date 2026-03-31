@@ -102,7 +102,7 @@ export default function Hero() {
           transition={{ duration: 1, delay: 0.2 }}
           className="mb-8 md:mb-10 w-full flex flex-col items-center gap-5"
         >
-          <Ornament icon="✦" className="drop-shadow-gold" />
+          <Ornament className="drop-shadow-gold" />
           
           <div className="relative font-accent text-xs md:text-sm uppercase text-gold tracking-[0.7em] font-medium mt-1">
             {T.location}

@@ -65,7 +65,7 @@ export default function Contact() {
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl text-charcoal font-semibold mb-4">
             {T.title}
           </h2>
-          <Ornament icon="◆" />
+          <Ornament />
         </motion.div>
 
         {/* ── Grid Layout ── */}
