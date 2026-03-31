@@ -1,10 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const setupDatabase = require('./config/setup');
 require('dotenv').config();
-
-// Initialize DB
-setupDatabase();
 
 const app = express();
 
@@ -15,11 +13,11 @@ const allowedOrigins = [
   'https://www.boutiquecouturerabat.me',
   'https://boutiquecouturerabat.me',
   'http://localhost:5173',
-  'http://localhost:3000'
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -29,7 +27,13 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
-app.use('/uploads', express.static('public/uploads'));
+
+// Static files with cache headers (1 day for images)
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads'), {
+  maxAge: '1d',
+  etag: true,
+  lastModified: true
+}));
 
 // Routes
 const productRoutes = require('./routes/products');
@@ -49,13 +53,29 @@ app.get('/', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  // Handle multer file size errors
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ error: 'File too large. Maximum size is 5MB.' });
+  }
   console.error(err.stack);
   res.status(500).json({
     error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message
   });
 });
 
+// Initialize DB then start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+
+setupDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Database setup failed, starting server without DB:', err.message);
+    // Start server anyway — API will return errors on DB queries, but won't crash
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT} (DB unavailable)`);
+    });
+  });

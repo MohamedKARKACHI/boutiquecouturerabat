@@ -1,13 +1,41 @@
 import { Link, useLocation } from 'react-router-dom'
 import { FaWhatsapp, FaInstagram, FaFacebookF } from 'react-icons/fa'
+import { useLanguage } from '../context/LanguageContext'
 
-const FOOTER_LINKS = [
-  { label: 'Accueil', path: '/', id: 'hero' },
-  { label: 'Collections', path: '/shop', id: 'collection' },
-  { label: 'Sur-Mesure', path: '/', id: 'surmesure' },
-  { label: 'Galerie', path: '/', id: 'gallery' },
-  { label: 'Contact', path: '/', id: 'contact' },
-]
+const TRANSLATIONS = {
+  FR: {
+    brand: 'Bespoke Moroccan elegance since generations. Master Tailor Aziz Bousseta crafts luxury traditional wear in the heart of Marrakech.',
+    nav: 'Navigation',
+    contact: 'Contact',
+    legal: 'Légal',
+    terms: 'Conditions Générales',
+    privacy: 'Politique de Confidentialité',
+    license: 'Licence & Copyright',
+    links: [
+      { label: 'Accueil', path: '/', id: 'hero' },
+      { label: 'Collections', path: '/shop', id: 'collection' },
+      { label: 'Sur-Mesure', path: '/', id: 'surmesure' },
+      { label: 'Galerie', path: '/', id: 'gallery' },
+      { label: 'Contact', path: '/', id: 'contact' },
+    ]
+  },
+  EN: {
+    brand: 'Bespoke Moroccan elegance since generations. Master Tailor Aziz Bousseta crafts luxury traditional wear in the heart of the Marrakech Medina.',
+    nav: 'Navigation',
+    contact: 'Contact',
+    legal: 'Legal',
+    terms: 'Terms & Conditions',
+    privacy: 'Privacy Policy',
+    license: 'License & Copyright',
+    links: [
+      { label: 'Home', path: '/', id: 'hero' },
+      { label: 'Collections', path: '/shop', id: 'collection' },
+      { label: 'Bespoke', path: '/', id: 'surmesure' },
+      { label: 'Gallery', path: '/', id: 'gallery' },
+      { label: 'Contact', path: '/', id: 'contact' },
+    ]
+  }
+}
 
 const SOCIALS = [
   { icon: FaInstagram, href: 'https://www.instagram.com/', label: 'Instagram' },
@@ -17,6 +45,8 @@ const SOCIALS = [
 export default function Footer() {
   const year = new Date().getFullYear()
   const location = useLocation()
+  const { lang } = useLanguage()
+  const T = TRANSLATIONS[lang]
 
   const handleNav = (l) => {
     if (location.pathname === '/' && l.id !== 'collection') {
@@ -45,16 +75,15 @@ export default function Footer() {
               </Link>
             </div>
             <p className="text-ivory/35 text-sm leading-relaxed max-w-xs">
-              Bespoke Moroccan elegance since generations. Master Tailor Aziz Bousseta crafts luxury
-              traditional wear in the heart of Marrakech.
+              {T.brand}
             </p>
           </div>
 
           {/* Navigation */}
           <div>
-            <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">Navigation</h4>
+            <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">{T.nav}</h4>
             <ul className="space-y-3">
-              {FOOTER_LINKS.map((l) => (
+              {T.links.map((l) => (
                 <li key={l.label}>
                   <Link
                     to={l.path}
@@ -70,10 +99,10 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">Contact</h4>
+            <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">{T.contact}</h4>
             <div className="space-y-2 text-ivory/35 text-sm">
-              <p>Médina de Marrakech</p>
-              <p>Marrakech, Morocco</p>
+              <p>Dar Pacha, Arset Aouzal</p>
+              <p>Marrakech 40030, Maroc</p>
               <a href="tel:+212666780147" className="block hover:text-gold transition-colors">
                 +212 666 780 147
               </a>
@@ -91,21 +120,21 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">Légal</h4>
+            <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">{T.legal}</h4>
             <ul className="space-y-3">
               <li>
                 <Link to="/legal" className="text-ivory/35 hover:text-gold text-sm transition-colors">
-                  Terms & Conditions
+                  {T.terms}
                 </Link>
               </li>
               <li>
                 <Link to="/legal" className="text-ivory/35 hover:text-gold text-sm transition-colors">
-                  Privacy Policy
+                  {T.privacy}
                 </Link>
               </li>
               <li>
                 <Link to="/legal" className="text-ivory/35 hover:text-gold text-sm transition-colors">
-                  License & Copyright
+                  {T.license}
                 </Link>
               </li>
             </ul>

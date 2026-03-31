@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiOutlineHome, HiOutlineShoppingBag, HiMenu, HiX } from 'react-icons/hi'
 import { FaWhatsapp } from 'react-icons/fa'
@@ -18,6 +18,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const NAV_LINKS = getNavLinks(lang)
 
   useEffect(() => {
@@ -33,10 +34,25 @@ export default function Navbar() {
 
   const handleSectionClick = (id) => {
     setOpen(false)
-    if (location.pathname !== '/') return // Router will handle path change
+    if (location.pathname !== '/') {
+      // Navigate to home first, then scroll after page loads
+      navigate('/', { state: { scrollTo: id } })
+      return
+    }
     const el = document.getElementById(id)
     if (el) el.scrollIntoView({ behavior: 'smooth' })
   }
+
+  // Handle scroll-to after navigation from another page
+  useEffect(() => {
+    if (location.pathname === '/' && location.state?.scrollTo) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(location.state.scrollTo)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [location])
 
   return (
     <>

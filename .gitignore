@@ -24,3 +24,4 @@ Thumbs.db
 .idea/
 *.suo
 *.sln
+.node_runtime/

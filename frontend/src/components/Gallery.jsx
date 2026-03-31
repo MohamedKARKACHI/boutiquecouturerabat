@@ -28,12 +28,13 @@ export default function Gallery() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
   const [galleryItems, setGalleryItems] = useState([])
+  const [loading, setLoading] = useState(true)
   const [lightbox, setLightbox] = useState(null)
 
   useEffect(() => {
     fetchGallery()
-      .then(data => setGalleryItems(data))
-      .catch(err => console.error('Error fetching gallery:', err))
+      .then(data => { setGalleryItems(data); setLoading(false) })
+      .catch(err => { console.error('Error fetching gallery:', err); setLoading(false) })
   }, [])
 
   const close = () => setLightbox(null)
@@ -60,7 +61,13 @@ export default function Gallery() {
 
         {/* ── Grid ── */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-8">
-          {galleryItems.map((item, i) => {
+          {loading ? (
+            // Skeleton placeholders
+            [...Array(6)].map((_, i) => (
+              <div key={i} className="aspect-[4/3] rounded-xl md:rounded-2xl bg-cream animate-pulse" />
+            ))
+          ) : (
+          galleryItems.map((item, i) => {
             const imageUrl = item.image_path.startsWith('http')
               ? item.image_path
               : `${API_URL}/uploads/${item.image_path}`
@@ -77,6 +84,7 @@ export default function Gallery() {
                 <img
                   src={imageUrl}
                   alt={t(item, 'alt_text')}
+                  loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 {/* Hover overlay */}
@@ -95,7 +103,8 @@ export default function Gallery() {
                 </div>
               </motion.div>
             )
-          })}
+          })
+          )}
         </div>
       </div>
 

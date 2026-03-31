@@ -71,7 +71,11 @@ export default function ProductModal({ isOpen, product, onClose }) {
 
   let images = []
   if (product?.images && product.images.length > 0) {
-    images = product.images.map(img => img.startsWith('http') ? img : `${API_URL}/uploads/${img}`)
+    images = product.images.map(img => {
+      // Handle both object format {id, path} and string format
+      const imgPath = typeof img === 'string' ? img : (img.path || img.image_path || '')
+      return imgPath.startsWith('http') ? imgPath : `${API_URL}/uploads/${imgPath}`
+    })
   } else if (product?.main_image || product?.image) {
     const mainImg = product.main_image || product.image
     images = [mainImg.startsWith('http') ? mainImg : `${API_URL}/uploads/${mainImg}`]

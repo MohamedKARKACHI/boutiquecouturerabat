@@ -25,15 +25,15 @@ const getInfoCards = (lang) => [
     id: 1,
     icon: HiOutlineLocationMarker,
     title: lang === 'FR' ? 'Adresse' : 'Address',
-    lines: ['Souk des Teinturiers', 'Médina de Marrakech', 'Marrakech, Morocco'],
+    lines: ['Dar Pacha, Arset Aouzal', 'Médina de Marrakech 40030', 'Marrakech, Maroc'],
   },
   {
     id: 2,
     icon: HiOutlineClock,
     title: lang === 'FR' ? 'Horaires' : 'Hours',
     lines: lang === 'FR' 
-      ? ['Lundi – Samedi', '9h00 – 19h00', 'Dimanche : Sur rendez-vous']
-      : ['Monday – Saturday', '9:00 AM – 7:00 PM', 'Sunday: By appointment'],
+      ? ['Tous les jours', '10h00 – 22h00']
+      : ['Every day', '10:00 AM – 10:00 PM'],
   },
   {
     id: 3,
@@ -68,17 +68,18 @@ export default function Contact() {
           <Ornament icon="◆" />
         </motion.div>
 
-        {/* ── 2-column layout ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-start">
-          {/* Left: info cards + CTA */}
-          <div className="space-y-6">
+        {/* ── Grid Layout ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 lg:gap-x-12 gap-y-6 lg:gap-y-8 items-stretch">
+          
+          {/* Left: Info Cards */}
+          <div className="flex flex-col gap-6">
             {INFO_CARDS.map((card, i) => (
               <motion.div
                 key={card.id}
                 initial={{ opacity: 0, x: -24 }}
                 animate={inView ? { opacity: 1, x: 0 } : {}}
                 transition={{ duration: 0.55, delay: i * 0.12 }}
-                className="flex gap-5 p-6 rounded-2xl bg-white/70 backdrop-blur-sm border border-sand hover:border-gold/30 hover:shadow-lg transition-all duration-300"
+                className="flex gap-5 p-6 rounded-2xl bg-white/70 backdrop-blur-sm border border-sand hover:border-gold/30 hover:shadow-lg transition-all duration-300 flex-1"
               >
                 <div className="w-12 h-12 rounded-xl bg-majorelle/10 flex items-center justify-center shrink-0">
                   <card.icon className="w-6 h-6 text-majorelle" />
@@ -91,12 +92,39 @@ export default function Contact() {
                 </div>
               </motion.div>
             ))}
+          </div>
 
-            {/* CTA */}
+          {/* Right: Map — matches height of info cards */}
+          <motion.div
+            initial={{ opacity: 0, x: 24 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.25 }}
+            className="relative h-full min-h-[400px] rounded-2xl overflow-hidden shadow-2xl"
+          >
+            <iframe
+              title="Boutique Couturier Rabat — Marrakech"
+              src="https://maps.google.com/maps?q=Boutique%20couturier%20rabat,%20Marrakech&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="absolute inset-0"
+            />
+            {/* Map overlay badge */}
+            <div className="absolute bottom-4 left-4 right-4 bg-charcoal/80 backdrop-blur-sm rounded-xl p-4 border border-gold/20 pointer-events-none">
+              <p className="font-display text-sm text-gold font-semibold">BOUTIQUE COUTURIER RABAT</p>
+              <p className="text-ivory/50 text-xs mt-1">Dar Pacha, Arset Aouzal — Marrakech</p>
+            </div>
+          </motion.div>
+
+          {/* CTA Row (spans only under the cards on desktop) */}
+          <div className="md:col-start-1 mt-2">
             <motion.a
               initial={{ opacity: 0, y: 16 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-               transition={{ duration: 0.5, delay: 0.45 }}
+              transition={{ duration: 0.5, delay: 0.45 }}
               href={`https://wa.me/212666780147?text=${encodeURIComponent(T.whatsappMsg)}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -108,31 +136,6 @@ export default function Contact() {
               {T.cta}
             </motion.a>
           </div>
-
-          {/* Right: Map — fixed height, rounded */}
-          <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.25 }}
-            className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl"
-          >
-            <iframe
-              title="BOUTIQUE COUTURE RABAT"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3397.068!2d-7.9893!3d31.6295!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzHCsDM3JzQ2LjIiTiA3wrA1OSczMS45Ilc!5e0!3m2!1sfr!2sma!4v1"
-              width="100%"
-              height="100%"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              className="absolute inset-0"
-            />
-            {/* Map overlay badge */}
-            <div className="absolute bottom-4 left-4 right-4 bg-charcoal/80 backdrop-blur-sm rounded-xl p-4 border border-gold/20 pointer-events-none">
-              <p className="font-display text-sm text-gold font-semibold">BOUTIQUE COUTURE RABAT</p>
-              <p className="text-ivory/50 text-xs mt-1">Médina de Marrakech, Morocco</p>
-            </div>
-          </motion.div>
         </div>
       </div>
     </section>

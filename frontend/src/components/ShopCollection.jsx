@@ -240,7 +240,7 @@ export default function ShopCollection() {
       </div>
 
       <div className="section-container py-12 md:py-20 flex flex-col lg:flex-row gap-16 lg:gap-16">
-        <aside className="hidden lg:flex w-[280px] shrink-0 flex-col">
+        <aside className="hidden lg:flex w-[280px] shrink-0 flex-col sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto modal-scrollbar">
           {filterContent}
         </aside>
 
