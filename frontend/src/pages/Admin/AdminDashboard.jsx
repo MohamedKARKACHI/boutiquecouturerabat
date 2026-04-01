@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   HiOutlineViewGrid, HiOutlineShoppingBag, HiOutlineTag, 
   HiOutlinePhotograph, HiOutlineLogout, HiMenuAlt2, HiX,
-  HiOutlineSun, HiOutlineMoon
+  HiOutlineSun, HiOutlineMoon, HiOutlineEye, HiOutlineEyeOff
 } from 'react-icons/hi'
 import { ToastProvider } from '../../components/Admin/AdminToast'
 import AdminStats from '../../components/Admin/AdminStats'
@@ -26,6 +26,7 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [stats, setStats] = useState({ products: 0, categories: 0, gallery: 0 })
   const [theme, setTheme] = useState(() => localStorage.getItem('adminTheme') || 'dark')
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     localStorage.setItem('adminTheme', theme)
@@ -90,14 +91,23 @@ export default function AdminDashboard() {
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Mot de passe</label>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[var(--a-input)] border border-[var(--a-border-std)] rounded-xl py-3.5 px-4 text-[var(--a-text)] placeholder-[var(--a-text-20)] focus:outline-none focus:border-gold/40 transition-colors"
-                placeholder="••••••••"
-                autoComplete="current-password"
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-[var(--a-input)] border border-[var(--a-border-std)] rounded-xl py-3.5 px-4 pr-12 text-[var(--a-text)] placeholder-[var(--a-text-20)] focus:outline-none focus:border-gold/40 transition-colors"
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-[var(--a-text)]/30 hover:text-[var(--a-text)]/60 transition-colors"
+                >
+                  {showPassword ? <HiOutlineEyeOff className="w-5 h-5" /> : <HiOutlineEye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
             <button 
               type="submit"
@@ -173,33 +183,9 @@ export default function AdminDashboard() {
             --a-text-5: #e0d5ca;
           }
         `}} />
-        {/* Mobile menu button */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="fixed top-5 left-5 z-50 lg:hidden p-3 bg-[var(--a-sub)] backdrop-blur-xl rounded-xl border border-[var(--a-border-std)] text-[var(--a-text)]"
-        >
-          {sidebarOpen ? <HiX className="w-5 h-5" /> : <HiMenuAlt2 className="w-5 h-5" />}
-        </button>
 
-        {/* Mobile overlay */}
-        <AnimatePresence>
-          {sidebarOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
-            />
-          )}
-        </AnimatePresence>
-
-        {/* ── Sidebar ── */}
-        <aside className={`
-          fixed lg:sticky top-0 left-0 z-40 h-screen w-64 bg-[var(--a-bg)] border-r border-[var(--a-border)] flex flex-col p-6
-          transition-transform duration-300 lg:translate-x-0
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}>
+        {/* ── Desktop Sidebar (lg+) ── */}
+        <aside className="hidden lg:flex sticky top-0 left-0 z-40 h-screen w-64 bg-[var(--a-bg)] border-r border-[var(--a-border)] flex-col p-6">
           {/* Brand */}
           <div className="mb-10 mt-2">
             <h2 className="font-display text-lg font-bold text-[var(--a-text)] tracking-wide">Boutique Couturier</h2>
@@ -246,7 +232,29 @@ export default function AdminDashboard() {
         </aside>
 
         {/* ── Main Content ── */}
-        <main className="flex-1 p-6 lg:p-10 overflow-y-auto min-h-screen">
+        <main className="flex-1 p-6 lg:p-10 overflow-y-auto min-h-screen pb-24 lg:pb-10">
+          {/* Mobile top bar */}
+          <div className="lg:hidden flex items-center justify-between mb-6">
+            <div>
+              <h2 className="font-display text-base font-bold text-[var(--a-text)] tracking-wide">Boutique Couturier</h2>
+              <p className="text-[8px] text-[var(--a-text)]/25 uppercase tracking-[0.3em]">Panel Admin</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
+                className="p-2.5 rounded-xl bg-[var(--a-panel)] border border-[var(--a-border)] text-[var(--a-text)]/50 hover:text-[var(--a-text)] transition-all"
+              >
+                {theme === 'dark' ? <HiOutlineSun className="w-4 h-4" /> : <HiOutlineMoon className="w-4 h-4" />}
+              </button>
+              <button 
+                onClick={() => { if (window.confirm('Se déconnecter ?')) setIsAuthenticated(false) }}
+                className="p-2.5 rounded-xl bg-[var(--a-panel)] border border-[var(--a-border)] text-red-500/60 hover:text-red-500 transition-all"
+              >
+                <HiOutlineLogout className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
           <AnimatePresence mode="wait">
             {activeTab === 'dashboard' && (
               <motion.div key="dashboard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
@@ -270,6 +278,31 @@ export default function AdminDashboard() {
             )}
           </AnimatePresence>
         </main>
+
+        {/* ── Mobile Bottom Tab Bar ── */}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--a-bg)]/95 backdrop-blur-xl border-t border-[var(--a-border)] flex items-center justify-around" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}>
+          {NAV_ITEMS.map(item => (
+            <button
+              key={item.key}
+              onClick={() => handleNavigate(item.key)}
+              className={`flex flex-col items-center gap-1 py-3 px-4 transition-all duration-200 relative ${
+                activeTab === item.key
+                  ? 'text-gold'
+                  : 'text-[var(--a-text)]/30'
+              }`}
+            >
+              {activeTab === item.key && (
+                <motion.div
+                  layoutId="bottomTabIndicator"
+                  className="absolute -top-0.5 w-8 h-0.5 bg-gold rounded-full"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+              <item.icon className="w-5 h-5" />
+              <span className="text-[9px] font-bold uppercase tracking-wider">{item.label}</span>
+            </button>
+          ))}
+        </nav>
       </div>
     </ToastProvider>
   )

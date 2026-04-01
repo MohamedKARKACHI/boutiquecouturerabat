@@ -124,10 +124,14 @@ export default function ProductModal({ isOpen, product, onClose }) {
       ? `${product.price} DH`
       : product.price
 
+    const promoLine = product.promo_active && product.old_price
+      ? `\n*🏷️ Promo :* ~${Number(product.old_price).toLocaleString()} DH~ → ${priceText} (-${Math.round(((Number(product.old_price) - Number(product.price)) / Number(product.old_price)) * 100)}%)`
+      : ''
+
     const message = `${T.orderHeader}\n\n` +
       `${T.orderProduct} ${t(product, 'title')}\n` +
       `${T.orderCategory} ${product.category_name || ''}\n` +
-      `${T.orderPrice} ${priceText}\n` +
+      `${T.orderPrice} ${priceText}` + promoLine + `\n` +
       `${T.orderSize} ${selectedSize}\n` +
       (product.colors?.length > 0 ? `${T.orderColor} ${selectedColor}\n` : '') +
       `${T.orderClient} ${customerName.trim()}\n\n` +
@@ -269,9 +273,25 @@ export default function ProductModal({ isOpen, product, onClose }) {
                 <h2 className="font-display text-2xl md:text-3xl lg:text-4xl font-semibold text-charcoal mb-2 leading-tight">
                   {t(product, 'title')}
                 </h2>
-                <p className="text-lg md:text-xl text-gold-dark font-medium mb-6 md:mb-8">
-                  {product.price} {typeof product.price === 'number' ? 'DH' : ''}
-                </p>
+                
+                {product.promo_active && product.old_price ? (
+                  <div className="flex items-center gap-3.5 mb-6 md:mb-8">
+                    <span className="text-smoke/60 line-through decoration-smoke/40 decoration-[1.5px] text-base md:text-lg font-medium">
+                      {Number(product.old_price).toLocaleString()} <span className="text-xs">DH</span>
+                    </span>
+                    <span className="text-xl md:text-2xl text-charcoal font-bold tracking-wide">
+                      {Number(product.price).toLocaleString()} <span className="text-base font-semibold">DH</span>
+                    </span>
+                    <span className="relative overflow-hidden px-2.5 py-1 text-black text-[10px] sm:text-[11px] font-black tracking-widest uppercase rounded-md shadow-[0_0_10px_rgba(191,149,63,0.5)] ml-2 bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728]">
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent w-full h-full block animate-[shimmer-gold_2.5s_infinite]" />
+                      <span className="relative z-10">-{Math.round(((Number(product.old_price) - Number(product.price)) / Number(product.old_price)) * 100)}%</span>
+                    </span>
+                  </div>
+                ) : (
+                  <p className="text-lg md:text-xl text-gold-dark font-medium mb-6 md:mb-8">
+                    {product.price} {typeof product.price === 'number' ? 'DH' : ''}
+                  </p>
+                )}
 
                 <div className="prose prose-sm text-smoke mb-8 leading-relaxed">
                   <p>

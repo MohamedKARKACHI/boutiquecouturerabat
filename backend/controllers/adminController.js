@@ -4,13 +4,13 @@ const db = require('../config/db');
 
 exports.createProduct = async (req, res, next) => {
   try {
-    const { title, title_en, slug, price, category_id, description, description_en, in_stock, is_featured } = req.body;
+    const { title, title_en, slug, price, category_id, description, description_en, in_stock, is_featured, old_price, promo_active } = req.body;
     const main_image = req.files?.['image']?.[0]?.filename || '';
 
     const [result] = await db.query(
-      `INSERT INTO products (title, title_en, slug, price, category_id, description, description_en, main_image, in_stock, is_featured) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [title, title_en || '', slug, price, category_id, description || '', description_en || '', main_image, in_stock === 'true', is_featured === 'true']
+      `INSERT INTO products (title, title_en, slug, price, category_id, description, description_en, main_image, in_stock, is_featured, old_price, promo_active) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [title, title_en || '', slug, price, category_id, description || '', description_en || '', main_image, in_stock === 'true', is_featured === 'true', old_price || null, promo_active === 'true']
     );
 
     const productId = result.insertId;
@@ -31,10 +31,10 @@ exports.createProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res, next) => {
   try {
     const productId = req.params.id;
-    const { title, title_en, slug, price, category_id, description, description_en, in_stock, is_featured, remove_images } = req.body;
+    const { title, title_en, slug, price, category_id, description, description_en, in_stock, is_featured, remove_images, old_price, promo_active } = req.body;
     
-    let query = `UPDATE products SET title=?, title_en=?, slug=?, price=?, category_id=?, description=?, description_en=?, in_stock=?, is_featured=?`;
-    const params = [title, title_en || '', slug, price, category_id, description || '', description_en || '', in_stock === 'true', is_featured === 'true'];
+    let query = `UPDATE products SET title=?, title_en=?, slug=?, price=?, category_id=?, description=?, description_en=?, in_stock=?, is_featured=?, old_price=?, promo_active=?`;
+    const params = [title, title_en || '', slug, price, category_id, description || '', description_en || '', in_stock === 'true', is_featured === 'true', old_price || null, promo_active === 'true'];
 
     if (req.files?.['image']) {
       query += `, main_image=?`;

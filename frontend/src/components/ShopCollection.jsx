@@ -7,6 +7,16 @@ import { fetchProducts, fetchCategories } from '../api'
 import heroImg from '../assets/slide2.jpg'
 import { useLanguage } from '../context/LanguageContext'
 
+const shimmerStyle = `
+  @keyframes shimmer-gold {
+    0% { transform: translateX(-150%) skewX(-15deg); }
+    50%, 100% { transform: translateX(150%) skewX(-15deg); }
+  }
+  .animate-shimmer-gold {
+    animation: shimmer-gold 2.5s infinite;
+  }
+`;
+
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 const TRANSLATIONS = {
@@ -216,6 +226,7 @@ export default function ShopCollection() {
 
   return (
     <div className="min-h-screen bg-ivory pt-[64px] md:pt-[80px]">
+      <style dangerouslySetInnerHTML={{ __html: shimmerStyle }} />
       <div className="relative h-[280px] md:h-[350px] flex items-center justify-center overflow-hidden bg-charcoal">
         <img src={heroImg} alt="" className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay" />
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/50 to-transparent" />
@@ -287,6 +298,15 @@ export default function ShopCollection() {
                           </span>
                         </div>
                       )}
+
+                      {p.promo_active && p.old_price && (
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3 rounded-md overflow-hidden shadow-[0_0_10px_rgba(191,149,63,0.5)]">
+                          <span className="block relative px-2.5 sm:px-3 py-1 sm:py-1.5 text-black text-[9px] sm:text-[10px] font-black tracking-widest uppercase overflow-hidden bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728]">
+                            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent w-full h-full block animate-shimmer-gold" />
+                            <span className="relative z-10">-{Math.round(((Number(p.old_price) - Number(p.price)) / Number(p.old_price)) * 100)}%</span>
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="text-center px-2 sm:px-4 pt-0 sm:pt-0 flex flex-col flex-1">
@@ -294,7 +314,19 @@ export default function ShopCollection() {
                         {p[`category_name${lang === 'EN' ? '_en' : ''}`] || p.category_name}
                       </p>
                       <h4 className="font-display text-base sm:text-lg text-charcoal font-semibold mb-1 line-clamp-1">{t(p, 'title')}</h4>
-                      <p className="text-smoke text-xs sm:text-sm font-medium mb-3 sm:mb-4">{Number(p.price).toLocaleString()} DH</p>
+                      
+                      {p.promo_active && p.old_price ? (
+                        <div className="flex items-center justify-center gap-2.5 mb-3 sm:mb-4">
+                          <span className="text-smoke/60 text-xs line-through decoration-smoke/40 decoration-[1.5px] font-medium">
+                            {Number(p.old_price).toLocaleString()} <span className="text-[10px]">DH</span>
+                          </span>
+                          <span className="text-charcoal text-sm sm:text-base font-bold">
+                            {Number(p.price).toLocaleString()} <span className="text-xs">DH</span>
+                          </span>
+                        </div>
+                      ) : (
+                        <p className="text-smoke text-xs sm:text-sm font-medium mb-3 sm:mb-4">{Number(p.price).toLocaleString()} DH</p>
+                      )}
 
                       <div className="flex items-center justify-center gap-1 sm:gap-1.5 mt-auto mb-4 sm:mb-5">
                         {p.colors && p.colors.map(hex => (

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { HiPlus, HiPencilAlt, HiTrash, HiCheck, HiX, HiStar, HiChevronDown } from 'react-icons/hi'
+import { HiPlus, HiPencilAlt, HiTrash, HiCheck, HiX, HiChevronDown } from 'react-icons/hi'
 import { fetchProducts, fetchCategories, fetchProductById } from '../../api'
 import ImageDropZone, { MultiImageDropZone } from './ImageDropZone'
 import ConfirmationModal from './ConfirmationModal'
@@ -9,8 +9,9 @@ import { useToast } from './AdminToast'
 const API_URL = import.meta.env.VITE_API_URL || ''
 
 const EMPTY_FORM = {
-  id: null, title: '', title_en: '', slug: '', price: '', category_id: '',
+  id: null, title: '', title_en: '', slug: '', base_price: '', promo_price: '', category_id: '',
   description: '', description_en: '', in_stock: true, is_featured: false,
+  promo_active: false,
   image: null, gallery: [], existingGallery: [], removeImages: []
 }
 
@@ -54,11 +55,20 @@ export default function ProductAdmin() {
     try {
       const detail = await fetchProductById(p.id)
       setFormData({
-        id: detail.id, title: detail.title, title_en: detail.title_en || '',
-        slug: detail.slug, price: detail.price, category_id: detail.category_id,
-        description: detail.description || '', description_en: detail.description_en || '',
-        in_stock: !!detail.in_stock, is_featured: !!detail.is_featured,
-        image: null, gallery: [],
+        id: detail.id, 
+        title: detail.title, 
+        title_en: detail.title_en || '',
+        slug: detail.slug, 
+        base_price: detail.promo_active ? detail.old_price : detail.price,
+        promo_price: detail.promo_active ? detail.price : '',
+        category_id: detail.category_id,
+        description: detail.description || '', 
+        description_en: detail.description_en || '',
+        in_stock: !!detail.in_stock, 
+        is_featured: !!detail.is_featured,
+        promo_active: !!detail.promo_active,
+        image: null, 
+        gallery: [],
         existingGallery: (detail.images || []).map(img => ({
           id: img.id,
           url: `${API_URL}/uploads/${img.path || img.image_path}`,
@@ -86,12 +96,14 @@ export default function ProductAdmin() {
     data.append('title', formData.title)
     data.append('title_en', formData.title_en)
     data.append('slug', formData.slug)
-    data.append('price', formData.price)
+    data.append('price', formData.promo_active ? formData.promo_price : formData.base_price)
     data.append('category_id', formData.category_id)
     data.append('description', formData.description)
     data.append('description_en', formData.description_en)
     data.append('in_stock', formData.in_stock)
     data.append('is_featured', formData.is_featured)
+    data.append('old_price', formData.promo_active ? formData.base_price : '')
+    data.append('promo_active', formData.promo_active)
 
     if (formData.image) data.append('image', formData.image)
     formData.gallery.forEach(file => data.append('gallery', file))
@@ -168,7 +180,7 @@ export default function ProductAdmin() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-[11px] font-bold uppercase tracking-widest text-[var(--a-text)]/40">Prix (DH)</label>
-                  <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required
+                  <input type="number" value={formData.base_price} onChange={e => setFormData({...formData, base_price: e.target.value})} required
                     className="w-full bg-[var(--a-input)] border border-[var(--a-border-std)] rounded-xl px-4 py-3 text-[var(--a-text)] focus:border-gold/50 focus:outline-none transition-colors" />
                 </div>
                 <div className="space-y-2">
@@ -195,22 +207,48 @@ export default function ProductAdmin() {
             </div>
 
             {/* Toggles */}
-            <div className="flex gap-6">
-              <label className="flex items-center gap-3 cursor-pointer group">
+            <div className="flex flex-wrap gap-6">
+              <label className="flex items-center gap-3 cursor-pointer group" onClick={() => setFormData({...formData, in_stock: !formData.in_stock})}>
                 <div className={`w-10 h-6 rounded-full flex items-center transition-colors duration-200 ${formData.in_stock ? 'bg-emerald-500 justify-end' : 'bg-[var(--a-hover-2)] justify-start'}`}>
                   <div className="w-5 h-5 bg-[var(--a-text)] rounded-full mx-0.5 shadow-sm" />
                 </div>
                 <span className="text-sm text-[var(--a-text)]/60 group-hover:text-[var(--a-text)]/80 transition-colors">En stock</span>
               </label>
-              <input type="checkbox" checked={formData.in_stock} onChange={e => setFormData({...formData, in_stock: e.target.checked})} className="hidden" />
-              
-              <label className="flex items-center gap-3 cursor-pointer group" onClick={() => setFormData({...formData, is_featured: !formData.is_featured})}>
-                <div className={`w-10 h-6 rounded-full flex items-center transition-colors duration-200 ${formData.is_featured ? 'bg-gold justify-end' : 'bg-[var(--a-hover-2)] justify-start'}`}>
+
+              <label className="flex items-center gap-3 cursor-pointer group" onClick={() => setFormData({...formData, promo_active: !formData.promo_active})}>
+                <div className={`w-10 h-6 rounded-full flex items-center transition-colors duration-200 ${formData.promo_active ? 'bg-red-500 justify-end' : 'bg-[var(--a-hover-2)] justify-start'}`}>
                   <div className="w-5 h-5 bg-[var(--a-text)] rounded-full mx-0.5 shadow-sm" />
                 </div>
-                <span className="text-sm text-[var(--a-text)]/60 group-hover:text-[var(--a-text)]/80 transition-colors">Vedette</span>
+                <span className="text-sm text-[var(--a-text)]/60 group-hover:text-[var(--a-text)]/80 transition-colors">Promo</span>
               </label>
             </div>
+
+            {/* Promo Section */}
+            {formData.promo_active && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                <div className="rounded-xl bg-red-500/5 border border-red-500/20 p-5 space-y-4">
+                  <h4 className="text-xs font-bold uppercase tracking-widest text-red-400 flex items-center gap-2">
+                    🏷️ Configuration Promo
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold uppercase tracking-widest text-[var(--a-text)]/40">Prix Promotion (DH)</label>
+                      <input type="number" value={formData.promo_price} onChange={e => setFormData({...formData, promo_price: e.target.value})} required
+                        className="w-full bg-[var(--a-input)] border border-red-500/30 rounded-xl px-4 py-3 text-[var(--a-text)] focus:border-red-500/50 focus:outline-none transition-colors"
+                        placeholder="Ex: 1500" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[11px] font-bold uppercase tracking-widest text-[var(--a-text)]/40">Remise (%)</label>
+                      <div className="w-full bg-[var(--a-hover-2)] border border-[var(--a-border-std)] rounded-xl px-4 py-3 text-gold font-bold text-center">
+                        {formData.base_price && formData.promo_price && Number(formData.base_price) > Number(formData.promo_price)
+                          ? `-${Math.round(((Number(formData.base_price) - Number(formData.promo_price)) / Number(formData.base_price)) * 100)}%`
+                          : '—'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
           </div>
 
           {/* Images */}
@@ -300,20 +338,11 @@ export default function ProductAdmin() {
               {/* Image */}
               <div className="relative aspect-[4/3] overflow-hidden bg-[var(--a-sub-hover)]">
                 <img src={`${API_URL}/uploads/${p.main_image}`} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                {p.is_featured ? (
-                  <span className="absolute top-3 left-3 flex items-center gap-1.5 bg-gold/90 text-charcoal text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
-                    <HiStar className="w-3 h-3" /> Vedette
+                {p.promo_active && p.old_price ? (
+                  <span className="absolute top-3 left-3 flex items-center gap-1.5 bg-red-500/90 text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full">
+                    -{Math.round(((Number(p.old_price) - Number(p.price)) / Number(p.old_price)) * 100)}%
                   </span>
                 ) : null}
-                {/* Hover actions */}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                  <button onClick={() => handleEdit(p)} className="p-3 bg-[var(--a-hover-3)] backdrop-blur-sm rounded-xl text-[var(--a-text)] hover:bg-gold/80 hover:text-charcoal transition-all">
-                    <HiPencilAlt className="w-5 h-5" />
-                  </button>
-                  <button onClick={() => setDeleteId(p.id)} className="p-3 bg-[var(--a-hover-3)] backdrop-blur-sm rounded-xl text-[var(--a-text)] hover:bg-red-500 transition-all">
-                    <HiTrash className="w-5 h-5" />
-                  </button>
-                </div>
               </div>
               
               {/* Info */}
@@ -321,12 +350,27 @@ export default function ProductAdmin() {
                 <span className="text-[9px] font-bold uppercase tracking-widest text-gold/70">{p.category_name}</span>
                 <h3 className="font-display text-lg font-semibold text-[var(--a-text)] mt-1">{p.title}</h3>
                 <div className="flex items-center justify-between mt-3">
-                  <span className="text-[var(--a-text)]/80 font-bold">{Number(p.price).toLocaleString()} DH</span>
+                  <div className="flex items-center gap-2">
+                    {p.promo_active && p.old_price ? (
+                      <span className="text-[var(--a-text)]/40 line-through text-sm">{Number(p.old_price).toLocaleString()} DH</span>
+                    ) : null}
+                    <span className={`font-bold ${p.promo_active && p.old_price ? 'text-red-400' : 'text-[var(--a-text)]/80'}`}>{Number(p.price).toLocaleString()} DH</span>
+                  </div>
                   <span className={`text-[9px] font-bold uppercase tracking-widest flex items-center gap-1 ${p.in_stock ? 'text-emerald-400' : 'text-red-400'}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${p.in_stock ? 'bg-emerald-400' : 'bg-red-400'}`} />
                     {p.in_stock ? 'En stock' : 'Épuisé'}
                   </span>
                 </div>
+              </div>
+
+              {/* Action buttons - always visible */}
+              <div className="px-5 pb-4 flex items-center gap-2">
+                <button onClick={() => handleEdit(p)} className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--a-hover-1)] border border-[var(--a-border)] text-[var(--a-text)]/60 hover:text-gold hover:border-gold/30 transition-all text-xs font-bold uppercase tracking-widest">
+                  <HiPencilAlt className="w-4 h-4" /> Modifier
+                </button>
+                <button onClick={() => setDeleteId(p.id)} className="py-2.5 px-3 rounded-xl bg-[var(--a-hover-1)] border border-[var(--a-border)] text-[var(--a-text)]/40 hover:text-red-400 hover:border-red-500/30 hover:bg-red-500/10 transition-all">
+                  <HiTrash className="w-4 h-4" />
+                </button>
               </div>
             </motion.div>
           ))}
