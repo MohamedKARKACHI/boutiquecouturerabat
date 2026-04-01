@@ -12,7 +12,8 @@ const EMPTY_FORM = {
   id: null, title: '', title_en: '', slug: '', base_price: '', promo_price: '', category_id: '',
   description: '', description_en: '', in_stock: true, is_featured: false,
   promo_active: false,
-  image: null, gallery: [], existingGallery: [], removeImages: []
+  image: null, gallery: [], existingGallery: [], removeImages: [],
+  colors: []
 }
 
 function slugify(text) {
@@ -26,6 +27,7 @@ export default function ProductAdmin() {
   const toast = useToast()
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
+  const [globalColors, setGlobalColors] = useState([])
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState(EMPTY_FORM)
   const [deleteId, setDeleteId] = useState(null)
@@ -36,9 +38,10 @@ export default function ProductAdmin() {
 
   const loadData = async () => {
     try {
-      const [prods, cats] = await Promise.all([fetchProducts(), fetchCategories()])
+      const [prods, cats, colsRes] = await Promise.all([fetchProducts(), fetchCategories(), fetch(`${API_URL}/api/colors`)])
       setProducts(prods)
       setCategories(cats)
+      if (colsRes.ok) setGlobalColors(await colsRes.json())
       setLoading(false)
     } catch (err) {
       toast.error('Impossible de charger les données')
@@ -74,7 +77,8 @@ export default function ProductAdmin() {
           url: `${API_URL}/uploads/${img.path || img.image_path}`,
           path: img.path || img.image_path
         })),
-        removeImages: []
+        removeImages: [],
+        colors: (detail.colors || []).map(c => c.id)
       })
       setIsEditing(true)
     } catch (err) { toast.error('Erreur lors du chargement du produit') }
@@ -109,6 +113,9 @@ export default function ProductAdmin() {
     formData.gallery.forEach(file => data.append('gallery', file))
     if (formData.removeImages.length > 0) {
       data.append('remove_images', JSON.stringify(formData.removeImages))
+    }
+    if (formData.colors.length >= 0) {
+      data.append('colors', JSON.stringify(formData.colors))
     }
 
     try {
@@ -205,6 +212,38 @@ export default function ProductAdmin() {
                   className="w-full bg-[var(--a-input)] border border-[var(--a-border-std)] rounded-xl px-4 py-3 text-[var(--a-text)] placeholder-[var(--a-text-20)] focus:border-gold/50 focus:outline-none transition-colors resize-none" />
               </div>
             </div>
+
+            {/* Colors Selection */}
+            {globalColors.length > 0 && (
+              <div className="space-y-3">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-[var(--a-text)]/40">Couleurs Disponibles</label>
+                <div className="flex flex-wrap gap-3">
+                  {globalColors.map(color => {
+                    const isSelected = formData.colors.includes(color.id)
+                    return (
+                      <button type="button" key={color.id}
+                        onClick={() => {
+                          setFormData(prev => ({
+                            ...prev,
+                            colors: isSelected 
+                              ? prev.colors.filter(id => id !== color.id) 
+                              : [...prev.colors, color.id]
+                          }))
+                        }}
+                        className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl border transition-all ${
+                          isSelected ? 'bg-[var(--a-hover-2)] border-gold/50' : 'bg-[var(--a-input)] border-[var(--a-border-std)] opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <div className="w-4 h-4 rounded-full border border-black/20 shadow-sm" style={{ backgroundColor: color.hex_code }} />
+                        <span className={`text-[11px] font-medium ${isSelected ? 'text-[var(--a-text)]' : 'text-[var(--a-text)]/60'}`}>
+                          {color.name}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Toggles */}
             <div className="flex flex-wrap gap-6">

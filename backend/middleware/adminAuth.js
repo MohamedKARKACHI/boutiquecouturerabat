@@ -1,30 +1,28 @@
+const jwt = require('jsonwebtoken');
+
 /**
  * Admin Authentication Middleware
  * 
- * Checks for a valid API key in the Authorization header.
- * Format: Authorization: Bearer <ADMIN_API_KEY>
- * 
- * In development mode (no ADMIN_API_KEY set), all requests are allowed.
+ * Checks for a valid JWT in the Authorization header.
+ * Format: Authorization: Bearer <TOKEN>
  */
 module.exports = (req, res, next) => {
-  const apiKey = process.env.ADMIN_API_KEY;
-
-  // If no API key is configured, allow all requests (development mode)
-  if (!apiKey) {
-    return next();
-  }
-
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Authentication required. Provide Authorization: Bearer <API_KEY>' });
+    return res.status(401).json({ error: 'Authentication required. Provide Authorization: Bearer <TOKEN>' });
   }
 
   const token = authHeader.split(' ')[1];
 
-  if (token !== apiKey) {
-    return res.status(403).json({ error: 'Invalid API key' });
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key_luxury_boutique');
+    req.user = decoded;
+    next();
+  } catch (error) {
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    }
+    return res.status(403).json({ error: 'Invalid token' });
   }
-
-  next();
 };

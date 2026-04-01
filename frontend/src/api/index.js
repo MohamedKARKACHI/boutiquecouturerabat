@@ -24,3 +24,42 @@ export const fetchGallery = async () => {
   if (!response.ok) throw new Error('Failed to fetch gallery');
   return response.json();
 };
+
+export const fetchColors = async () => {
+  const response = await fetch(`${API_URL}/api/colors`);
+  if (!response.ok) throw new Error('Failed to fetch colors');
+  return response.json();
+};
+
+export const fetchHero = async () => {
+  const response = await fetch(`${API_URL}/api/hero`);
+  if (!response.ok) throw new Error('Failed to fetch hero');
+  return response.json();
+};
+
+export const fetchSettings = async () => {
+  const response = await fetch(`${API_URL}/api/settings`);
+  if (!response.ok) throw new Error('Failed to fetch settings');
+  return response.json();
+};
+
+export const adminLogin = async (username, password) => {
+  const response = await fetch(`${API_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  });
+  if (!response.ok) {
+     const error = await response.json();
+     throw new Error(error.error || 'Login failed');
+  }
+  return response.json();
+};
+
+// Helper to get headers with token
+export const getAdminHeaders = () => {
+  const token = localStorage.getItem('adminToken');
+  return {
+    'Authorization': `Bearer ${token}`
+  };
+};

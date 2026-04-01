@@ -40,11 +40,19 @@ const productRoutes = require('./routes/products');
 const categoryRoutes = require('./routes/categories');
 const galleryRoutes = require('./routes/gallery');
 const adminRoutes = require('./routes/admin');
+const colorRoutes = require('./routes/colors');
+const authRoutes = require('./routes/auth');
+const heroRoutes = require('./routes/hero');
+const settingsRoutes = require('./routes/settings');
 
 app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/colors', colorRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/hero', heroRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Root route
 app.get('/', (req, res) => {

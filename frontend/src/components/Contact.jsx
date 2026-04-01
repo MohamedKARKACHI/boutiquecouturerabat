@@ -1,8 +1,9 @@
+import { useState, useEffect, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
 import { HiOutlineLocationMarker, HiOutlineClock, HiOutlinePhone } from 'react-icons/hi'
 import Ornament from './Ornament'
 import { useLanguage } from '../context/LanguageContext'
+import { fetchSettings } from '../api'
 
 const TRANSLATIONS = {
   FR: {
@@ -19,36 +20,47 @@ const TRANSLATIONS = {
   }
 }
 
-/* ── Data constant ── */
-const getInfoCards = (lang) => [
-  {
-    id: 1,
-    icon: HiOutlineLocationMarker,
-    title: lang === 'FR' ? 'Adresse' : 'Address',
-    lines: ['Dar Pacha, Arset Aouzal', 'Médina de Marrakech 40030', 'Marrakech, Maroc'],
-  },
-  {
-    id: 2,
-    icon: HiOutlineClock,
-    title: lang === 'FR' ? 'Horaires' : 'Hours',
-    lines: lang === 'FR' 
-      ? ['Tous les jours', '10h00 – 22h00']
-      : ['Every day', '10:00 AM – 10:00 PM'],
-  },
-  {
-    id: 3,
-    icon: HiOutlinePhone,
-    title: lang === 'FR' ? 'Contact' : 'Contact',
-    lines: ['+212 666 780 147', lang === 'FR' ? 'WhatsApp disponible' : 'WhatsApp available', 'boutiquecouturerabat@gmail.com'],
-  },
-]
-
 export default function Contact() {
   const { lang } = useLanguage()
   const T = TRANSLATIONS[lang]
-  const INFO_CARDS = getInfoCards(lang)
+  const [settings, setSettings] = useState(null)
+  const [loading, setLoading] = useState(true)
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
+
+  useEffect(() => {
+    fetchSettings()
+      .then(data => {
+        setSettings(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error('Error fetching settings:', err)
+        setLoading(false)
+      })
+  }, [])
+
+  const INFO_CARDS = [
+    {
+      id: 1,
+      icon: HiOutlineLocationMarker,
+      title: lang === 'FR' ? 'Adresse' : 'Address',
+      lines: settings ? [settings[`contact_address_${lang.toLowerCase()}`]] : ['Dar Pacha, Arset Aouzal', 'Médina de Marrakech 40030', 'Marrakech, Maroc'],
+    },
+    {
+      id: 2,
+      icon: HiOutlineClock,
+      title: lang === 'FR' ? 'Horaires' : 'Hours',
+      lines: settings ? [settings[`opening_hours_${lang.toLowerCase()}`]] : (lang === 'FR' ? ['Tous les jours', '10h00 – 22h00'] : ['Every day', '10:00 AM – 10:00 PM']),
+    },
+    {
+      id: 3,
+      icon: HiOutlinePhone,
+      title: lang === 'FR' ? 'Contact' : 'Contact',
+      lines: settings ? [settings.contact_phone, settings.contact_email] : ['+212 666 780 147', 'boutiquecouturerabat@gmail.com'],
+    },
+  ]
+
 
   return (
     <section id="contact" className="py-16 md:py-24 bg-cream zellige-pattern">

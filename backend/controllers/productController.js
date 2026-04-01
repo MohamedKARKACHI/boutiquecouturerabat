@@ -5,7 +5,7 @@ exports.getProducts = async (req, res, next) => {
     const { category, minPrice, maxPrice } = req.query;
     let query = `
       SELECT p.*, c.name as category_name, c.name_en as category_name_en, 
-      GROUP_CONCAT(col.hex_code) as colors
+      GROUP_CONCAT(DISTINCT col.hex_code) as colors
       FROM products p
       JOIN categories c ON p.category_id = c.id
       LEFT JOIN product_colors pc ON p.id = pc.product_id
@@ -54,7 +54,7 @@ exports.getProductById = async (req, res, next) => {
 
     const [images] = await db.query('SELECT id, image_path FROM product_images WHERE product_id = ?', [req.params.id]);
     const [colors] = await db.query(`
-      SELECT c.name, c.hex_code 
+      SELECT c.id, c.name, c.hex_code 
       FROM colors c 
       JOIN product_colors pc ON c.id = pc.color_id 
       WHERE pc.product_id = ?`, [req.params.id]);

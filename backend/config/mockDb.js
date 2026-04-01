@@ -8,7 +8,27 @@
  */
 
 // ── Data Store (mutable) ──
-let nextIds = { products: 4, categories: 5, gallery: 7, product_images: 1 };
+let nextIds = { products: 4, categories: 5, gallery: 7, product_images: 1, hero_slides: 2, users: 2 };
+
+let users = [
+  // $2a$10$6zN8... is a bcrypt hash for 'admin123' (simplified for mock)
+  { id: 1, username: 'admin', password_hash: '$2a$10$pCvjkTwhdah2otfX5AqTves9u1q2fOtq/JKfgnYD0Ij58muQshlym' }
+];
+
+let hero_slides = [
+  { id: 1, image_path: 'slide1.jpg', title_fr: 'Élégance Royale', title_en: 'Royal Elegance', subtitle_fr: 'Haute Couture Artisanale', subtitle_en: 'Artisanal Haute Couture', order_index: 0, is_active: 1 }
+];
+
+let settings = [
+  { setting_key: 'contact_phone', setting_value: '+212 666 780 147' },
+  { setting_key: 'contact_email', setting_value: 'boutiquecouturerabat@gmail.com' },
+  { setting_key: 'contact_address_fr', setting_value: 'Dar Pacha, Arset Aouzal, Médina de Marrakech 40030, Maroc' },
+  { setting_key: 'contact_address_en', setting_value: 'Dar Pacha, Arset Aouzal, Marrakech Medina 40030, Morocco' },
+  { setting_key: 'whatsapp_number', setting_value: '212666780147' },
+  { setting_key: 'opening_hours_fr', setting_value: 'Tous les jours: 10h00 – 22h00' },
+  { setting_key: 'opening_hours_en', setting_value: 'Every day: 10:00 AM – 10:00 PM' },
+  { setting_key: 'google_maps_url', setting_value: 'https://maps.google.com/maps?q=Boutique%20couturier%20rabat,%20Marrakech&t=&z=16&ie=UTF8&iwloc=&output=embed' }
+];
 
 let categories = [
   { id: 1, name: 'Caftans', name_en: 'Caftans', slug: 'caftans', image: 'caftans.png', description: 'Élégance traditionnelle revisitée', description_en: 'Traditional elegance, reimagined' },
@@ -109,6 +129,25 @@ const mockDb = {
       return [colors];
     }
 
+    // Hero Slides
+    if (q.includes('select') && q.includes('from hero_slides')) {
+      return [hero_slides.filter(s => s.is_active)];
+    }
+
+    // Settings
+    if (q.includes('select') && q.includes('from settings')) {
+      return [settings];
+    }
+
+    // Users
+    if (q.includes('select') && q.includes('from users')) {
+      if (q.includes('username = ?')) {
+        const u = users.find(user => user.username === params[0]);
+        return [u ? [u] : []];
+      }
+      return [users];
+    }
+
     // ═══════════════════════════════════════
     // INSERT queries
     // ═══════════════════════════════════════
@@ -148,6 +187,15 @@ const mockDb = {
       gallery.push({
         id, image_path: params[0], alt_text: params[1] || '',
         alt_text_en: params[2] || '', order_index: parseInt(params[3]) || 0
+      });
+      return [{ insertId: id, affectedRows: 1 }];
+    }
+
+    if (q.includes('insert into hero_slides')) {
+      const id = nextIds.hero_slides++;
+      hero_slides.push({
+        id, image_path: params[0], title_fr: params[1], title_en: params[2],
+        subtitle_fr: params[3], subtitle_en: params[4], order_index: parseInt(params[5]) || 0, is_active: 1
       });
       return [{ insertId: id, affectedRows: 1 }];
     }
@@ -212,6 +260,30 @@ const mockDb = {
         if (hasImage) {
           gallery[idx].image_path = params[3];
         }
+      }
+      return [{ affectedRows: idx !== -1 ? 1 : 0 }];
+    }
+
+    if (q.includes('update settings')) {
+      const idx = settings.findIndex(s => s.setting_key === params[1]);
+      if (idx !== -1) {
+        settings[idx].setting_value = params[0];
+      }
+      return [{ affectedRows: idx !== -1 ? 1 : 0 }];
+    }
+
+    if (q.includes('update hero_slides')) {
+      const id = parseInt(params[params.length - 1]);
+      const idx = hero_slides.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        const hasImage = q.includes('image_path=?');
+        hero_slides[idx].title_fr = params[0];
+        hero_slides[idx].title_en = params[1];
+        hero_slides[idx].subtitle_fr = params[2];
+        hero_slides[idx].subtitle_en = params[3];
+        hero_slides[idx].order_index = parseInt(params[4]);
+        hero_slides[idx].is_active = params[5] ? 1 : 0;
+        if (hasImage) hero_slides[idx].image_path = params[6];
       }
       return [{ affectedRows: idx !== -1 ? 1 : 0 }];
     }

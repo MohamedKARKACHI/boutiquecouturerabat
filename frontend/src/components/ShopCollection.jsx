@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { HiOutlineSearch, HiOutlineFilter, HiX } from 'react-icons/hi'
 import { FaWhatsapp } from 'react-icons/fa'
 import ProductModal from './ProductModal'
-import { fetchProducts, fetchCategories } from '../api'
+import { fetchProducts, fetchCategories, fetchColors } from '../api'
 import heroImg from '../assets/slide2.jpg'
 import { useLanguage } from '../context/LanguageContext'
 
@@ -56,20 +56,15 @@ const TRANSLATIONS = {
   }
 }
 
-const FILTER_COLORS = [
-  { id: 'noir', hex: '#1C1C1E', name: { FR: 'Noir', EN: 'Black' } },
-  { id: 'bleu', hex: '#1A2980', name: { FR: 'Bleu', EN: 'Blue' } },
-  { id: 'vert', hex: '#0D6B4B', name: { FR: 'Vert', EN: 'Green' } },
-  { id: 'terracotta', hex: '#C75B39', name: { FR: 'Rouge/Orange', EN: 'Red/Orange' } },
-  { id: 'beige', hex: '#E8DDD0', name: { FR: 'Beige', EN: 'Beige' } },
-  { id: 'or', hex: '#D4A843', name: { FR: 'Or', EN: 'Gold' } },
-]
+// Global colors will be fetched from API
+
 
 export default function ShopCollection() {
   const { lang, t } = useLanguage()
   const T = TRANSLATIONS[lang]
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
+  const [globalColors, setGlobalColors] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [maxPrice, setMaxPrice] = useState(5000)
@@ -81,12 +76,14 @@ export default function ShopCollection() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [prodData, catData] = await Promise.all([
+        const [prodData, catData, colorData] = await Promise.all([
           fetchProducts(),
-          fetchCategories()
+          fetchCategories(),
+          fetchColors()
         ])
         setProducts(prodData)
         setCategories(catData)
+        setGlobalColors(colorData)
       } catch (err) {
         console.error('Error loading data:', err)
       } finally {
@@ -169,16 +166,16 @@ export default function ShopCollection() {
           {T.colorLabel}
         </h3>
         <div className="flex flex-wrap gap-3">
-          {FILTER_COLORS.map((c) => {
-            const isSelected = selectedColors.includes(c.hex)
+          {globalColors.map((c) => {
+            const isSelected = selectedColors.includes(c.hex_code)
             return (
               <button
                 key={c.id}
-                onClick={() => toggleColor(c.hex)}
-                title={c.name[lang]}
+                onClick={() => toggleColor(c.hex_code)}
+                title={c.name}
                 className={`relative w-9 h-9 rounded-full border-2 transition-all ${isSelected ? 'border-charcoal scale-110 shadow-md' : 'border-transparent hover:scale-110 shadow-sm'
                   }`}
-                style={{ backgroundColor: c.hex }}
+                style={{ backgroundColor: c.hex_code }}
               >
                 {isSelected && (
                   <span className="absolute inset-0 flex items-center justify-center">
@@ -316,7 +313,7 @@ export default function ShopCollection() {
                       <h4 className="font-display text-base sm:text-lg text-charcoal font-semibold mb-1 line-clamp-1">{t(p, 'title')}</h4>
                       
                       {p.promo_active && p.old_price ? (
-                        <div className="flex items-center justify-center gap-2.5 mb-3 sm:mb-4">
+                        <div className="flex items-center justify-center gap-2.5 mb-2 sm:mb-3">
                           <span className="text-smoke/60 text-xs line-through decoration-smoke/40 decoration-[1.5px] font-medium">
                             {Number(p.old_price).toLocaleString()} <span className="text-[10px]">DH</span>
                           </span>
@@ -325,14 +322,22 @@ export default function ShopCollection() {
                           </span>
                         </div>
                       ) : (
-                        <p className="text-smoke text-xs sm:text-sm font-medium mb-3 sm:mb-4">{Number(p.price).toLocaleString()} DH</p>
+                        <p className="text-smoke text-xs sm:text-sm font-medium mb-2 sm:mb-3">{Number(p.price).toLocaleString()} DH</p>
                       )}
 
-                      <div className="flex items-center justify-center gap-1 sm:gap-1.5 mt-auto mb-4 sm:mb-5">
-                        {p.colors && p.colors.map(hex => (
-                          <div key={hex} className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full border border-black/10 shadow-sm" style={{ backgroundColor: hex }} />
-                        ))}
-                      </div>
+                      {/* Color Variants */}
+                      {p.colors && p.colors.length > 0 && p.colors[0] !== null && (
+                        <div className="flex items-center justify-center gap-1.5 mb-3 sm:mb-4">
+                          {p.colors.map((hex, idx) => (
+                            <div 
+                              key={idx} 
+                              className="w-3 h-3 rounded-full border border-gray-200 shadow-sm"
+                              style={{ backgroundColor: hex }}
+                            />
+                          ))}
+                        </div>
+                      )}
+
 
                       <button
                         onClick={() => setSelectedProduct(p)}

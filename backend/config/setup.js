@@ -25,19 +25,39 @@ const setupDatabase = async () => {
     // Check if tables exist
     const [tables] = await connection.query('SHOW TABLES');
     
+    // Always check for new tables (Migration)
+    const tableList = tables.map(t => Object.values(t)[0]);
+    
     if (tables.length === 0) {
       console.log('Database is empty. Running initialization script...');
       const sqlPath = path.join(__dirname, '..', 'init.sql');
       const sql = fs.readFileSync(sqlPath, 'utf8');
       const queries = sql.split(/;\s*$/m).filter(q => q.trim());
       for (let query of queries) {
-        if (query.trim()) {
-          await connection.query(query);
-        }
+        await connection.query(query);
       }
       console.log('Database initialized successfully.');
-    } else {
-       console.log('Database already exists and contains tables.');
+    }
+
+    // Run migration if tables are missing or just to be safe
+    const migrationPath = path.join(__dirname, '..', 'migrations', 'add_dynamic_tables.sql');
+    if (fs.existsSync(migrationPath)) {
+      console.log('Running dynamic tables migration...');
+      const sql = fs.readFileSync(migrationPath, 'utf8');
+      const queries = sql.split(/;\s*$/m).filter(q => q.trim());
+      for (let query of queries) {
+        await connection.query(query);
+      }
+      console.log('Migration completed.');
+    }
+
+    // Ensure Admin User exists
+    const [users] = await connection.query('SELECT * FROM users LIMIT 1');
+    if (users.length === 0) {
+      const bcrypt = require('bcryptjs');
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      await connection.query('INSERT INTO users (username, password_hash) VALUES (?, ?)', ['admin', hashedPassword]);
+      console.log('Default admin user created (admin / admin123)');
     }
 
   } catch (error) {

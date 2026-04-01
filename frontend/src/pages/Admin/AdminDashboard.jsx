@@ -3,30 +3,39 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   HiOutlineViewGrid, HiOutlineShoppingBag, HiOutlineTag, 
   HiOutlinePhotograph, HiOutlineLogout, HiMenuAlt2, HiX,
-  HiOutlineSun, HiOutlineMoon, HiOutlineEye, HiOutlineEyeOff
+  HiOutlineSun, HiOutlineMoon, HiOutlineEye, HiOutlineEyeOff, HiOutlineColorSwatch
 } from 'react-icons/hi'
 import { ToastProvider } from '../../components/Admin/AdminToast'
 import AdminStats from '../../components/Admin/AdminStats'
 import ProductAdmin from '../../components/Admin/ProductAdmin'
 import CategoryAdmin from '../../components/Admin/CategoryAdmin'
 import GalleryAdmin from '../../components/Admin/GalleryAdmin'
-import { fetchProducts, fetchCategories, fetchGallery } from '../../api'
+import ColorsAdmin from '../../components/Admin/ColorsAdmin'
+import { fetchProducts, fetchCategories, fetchGallery, adminLogin, fetchSettings } from '../../api'
+import HeroAdmin from '../../components/Admin/HeroAdmin'
+import SettingsAdmin from '../../components/Admin/SettingsAdmin'
 
 const NAV_ITEMS = [
   { key: 'dashboard', label: 'Dashboard', icon: HiOutlineViewGrid },
   { key: 'products', label: 'Produits', icon: HiOutlineShoppingBag },
   { key: 'categories', label: 'Catégories', icon: HiOutlineTag },
+  { key: 'colors', label: 'Couleurs', icon: HiOutlineColorSwatch },
   { key: 'gallery', label: 'Galerie', icon: HiOutlinePhotograph },
+  { key: 'hero', label: 'Design Hero', icon: HiOutlinePhotograph },
+  { key: 'settings', label: 'Paramètres', icon: HiOutlineViewGrid },
 ]
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('adminToken'))
+  const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [stats, setStats] = useState({ products: 0, categories: 0, gallery: 0 })
   const [theme, setTheme] = useState(() => localStorage.getItem('adminTheme') || 'dark')
   const [showPassword, setShowPassword] = useState(false)
+  const [loginLoading, setLoginLoading] = useState(false)
+  const [error, setError] = useState('')
 
   useEffect(() => {
     localStorage.setItem('adminTheme', theme)
@@ -43,16 +52,27 @@ export default function AdminDashboard() {
     } catch (err) { console.error(err) }
   }
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
-    if (password === 'admin123') {
+    setLoginLoading(true)
+    setError('')
+    try {
+      const data = await adminLogin(username, password)
+      localStorage.setItem('adminToken', data.token)
       setIsAuthenticated(true)
-    } else {
-      // Shake animation feedback
+    } catch (err) {
+      setError(err.message)
       const form = e.target
       form.classList.add('animate-shake')
       setTimeout(() => form.classList.remove('animate-shake'), 500)
+    } finally {
+      setLoginLoading(false)
     }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken')
+    setIsAuthenticated(false)
   }
 
   const handleNavigate = (tab) => {
@@ -90,14 +110,26 @@ export default function AdminDashboard() {
           
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Identifiant</label>
+              <input 
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl py-3 px-4 text-sm text-[var(--a-text)] placeholder:text-[var(--a-text)]/10 focus:outline-none focus:border-gold/50 transition-all"
+                placeholder="admin"
+                required
+              />
+            </div>
+            <div className="space-y-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Mot de passe</label>
               <div className="relative">
                 <input 
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-[var(--a-input)] border border-[var(--a-border-std)] rounded-xl py-3.5 px-4 pr-12 text-[var(--a-text)] placeholder-[var(--a-text-20)] focus:outline-none focus:border-gold/40 transition-colors"
+                  className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl py-3 px-4 text-sm text-[var(--a-text)] placeholder:text-[var(--a-text)]/10 focus:outline-none focus:border-gold/50 transition-all"
                   placeholder="••••••••"
+                  required
                   autoComplete="current-password"
                 />
                 <button
@@ -109,11 +141,17 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </div>
+
+            {error && (
+              <p className="text-red-500 text-[10px] uppercase tracking-widest font-bold text-center">{error}</p>
+            )}
+
             <button 
-              type="submit"
-              className="w-full bg-gold text-charcoal py-4 rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-gold-light transition-all shadow-lg shadow-gold/20"
+              type="submit" 
+              disabled={loginLoading}
+              className="w-full py-4 bg-gold text-black font-bold text-xs uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
             >
-              Se connecter
+              {loginLoading ? 'Connexion...' : 'Entrer'}
             </button>
           </form>
         </motion.div>
@@ -220,13 +258,11 @@ export default function AdminDashboard() {
               {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
             </button>
             <button 
-              onClick={() => {
-                if (window.confirm('Se déconnecter ?')) setIsAuthenticated(false)
-              }}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500/80 hover:text-red-600 hover:bg-red-500/10 transition-all text-sm font-semibold"
+              onClick={handleLogout}
+              className="mt-auto flex items-center gap-4 py-4 px-6 text-[var(--a-text)]/30 hover:text-red-400 transition-colors border-t border-[var(--a-border)]"
             >
               <HiOutlineLogout className="w-5 h-5" />
-              Déconnexion
+              <span className="text-xs font-bold uppercase tracking-widest">Déconnexion</span>
             </button>
           </div>
         </aside>
@@ -271,21 +307,36 @@ export default function AdminDashboard() {
                 <CategoryAdmin />
               </motion.div>
             )}
+            {activeTab === 'colors' && (
+              <motion.div key="colors" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                <ColorsAdmin />
+              </motion.div>
+            )}
             {activeTab === 'gallery' && (
               <motion.div key="gallery" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <GalleryAdmin />
+              </motion.div>
+            )}
+            {activeTab === 'hero' && (
+              <motion.div key="hero" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                <HeroAdmin />
+              </motion.div>
+            )}
+            {activeTab === 'settings' && (
+              <motion.div key="settings" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                <SettingsAdmin />
               </motion.div>
             )}
           </AnimatePresence>
         </main>
 
         {/* ── Mobile Bottom Tab Bar ── */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--a-bg)]/95 backdrop-blur-xl border-t border-[var(--a-border)] flex items-center justify-around" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}>
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--a-bg)]/95 backdrop-blur-xl border-t border-[var(--a-border)] flex items-center justify-between px-1" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}>
           {NAV_ITEMS.map(item => (
             <button
               key={item.key}
               onClick={() => handleNavigate(item.key)}
-              className={`flex flex-col items-center gap-1 py-3 px-4 transition-all duration-200 relative ${
+              className={`flex-1 flex flex-col items-center gap-1.5 py-3 px-1 transition-all duration-200 relative ${
                 activeTab === item.key
                   ? 'text-gold'
                   : 'text-[var(--a-text)]/30'
@@ -298,8 +349,8 @@ export default function AdminDashboard() {
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
-              <item.icon className="w-5 h-5" />
-              <span className="text-[9px] font-bold uppercase tracking-wider">{item.label}</span>
+              <item.icon className="w-5 h-5 shrink-0" />
+              <span className="text-[8px] font-bold uppercase truncate w-full text-center tracking-tight">{item.label}</span>
             </button>
           ))}
         </nav>

@@ -1,10 +1,12 @@
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { FaWhatsapp, FaInstagram, FaFacebookF } from 'react-icons/fa'
 import { useLanguage } from '../context/LanguageContext'
+import { fetchSettings } from '../api'
 
 const TRANSLATIONS = {
   FR: {
-    brand: 'Bespoke Moroccan elegance since generations. Master Tailor Aziz Bousseta crafts luxury traditional wear in the heart of Marrakech.',
+    brand: 'L\'élégance marocaine sur mesure depuis des générations. Le Maître Tailleur Aziz Bousseta façonne des tenues traditionnelles de luxe au cœur de Marrakech.',
     nav: 'Navigation',
     contact: 'Contact',
     legal: 'Légal',
@@ -38,7 +40,7 @@ const TRANSLATIONS = {
 }
 
 const SOCIALS = [
-  { icon: FaInstagram, href: 'https://www.instagram.com/', label: 'Instagram' },
+  { icon: FaInstagram, href: 'https://www.instagram.com/boutiquecouturerabat/', label: 'Instagram' },
   { icon: FaFacebookF, href: 'https://www.facebook.com/', label: 'Facebook' },
 ]
 
@@ -47,6 +49,11 @@ export default function Footer() {
   const location = useLocation()
   const { lang } = useLanguage()
   const T = TRANSLATIONS[lang]
+  const [settings, setSettings] = useState(null)
+
+  useEffect(() => {
+    fetchSettings().then(setSettings).catch(console.error)
+  }, [])
 
   const handleNav = (l) => {
     if (location.pathname === '/' && l.id !== 'collection') {
@@ -55,6 +62,7 @@ export default function Footer() {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
+
 
   return (
     <footer className="bg-charcoal">
@@ -101,13 +109,13 @@ export default function Footer() {
           <div>
             <h4 className="font-display text-sm tracking-widest text-gold/70 uppercase mb-5">{T.contact}</h4>
             <div className="space-y-2 text-ivory/35 text-sm">
-              <p>Dar Pacha, Arset Aouzal</p>
-              <p>Marrakech 40030, Maroc</p>
-              <a href="tel:+212666780147" className="block hover:text-gold transition-colors">
-                +212 666 780 147
+              <p>{settings ? settings[`contact_address_${lang.toLowerCase()}`] : 'Dar Pacha, Arset Aouzal'}</p>
+              <p>{settings ? '' : 'Marrakech 40030, Maroc'}</p>
+              <a href={`tel:${settings?.contact_phone || '+212666780147'}`} className="block hover:text-gold transition-colors">
+                {settings?.contact_phone || '+212 666 780 147'}
               </a>
               <a
-                href="https://wa.me/212666780147"
+                href={`https://wa.me/${settings?.whatsapp_number || '212666780147'}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-emerald hover:text-emerald-light transition-colors mt-2"
