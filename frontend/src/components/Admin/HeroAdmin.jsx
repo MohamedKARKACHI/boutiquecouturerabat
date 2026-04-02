@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiOutlinePlus, HiOutlineTrash, HiOutlinePencil, HiOutlineCheck, HiX } from 'react-icons/hi'
 import { getAdminHeaders } from '../../api'
+import ConfirmationModal from './ConfirmationModal'
 
 const API_URL = import.meta.env.VITE_API_URL || '';
 
@@ -10,11 +11,14 @@ export default function HeroAdmin() {
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingSlide, setEditingSlide] = useState(null)
-  
+  const [deleteId, setDeleteId] = useState(null)
+
   // Form state
   const [formData, setFormData] = useState({
     title_fr: '', title_en: '',
     subtitle_fr: '', subtitle_en: '',
+    gold_text_fr: '', gold_text_en: '',
+    italic_text_fr: '', italic_text_en: '',
     order_index: 0,
     image: null
   })
@@ -39,10 +43,10 @@ export default function HeroAdmin() {
       if (val !== null) data.append(key, val);
     });
 
-    const url = editingSlide 
+    const url = editingSlide
       ? `${API_URL}/api/admin/hero/${editingSlide.id}`
       : `${API_URL}/api/admin/hero`;
-    
+
     const method = editingSlide ? 'PUT' : 'POST';
 
     try {
@@ -60,13 +64,14 @@ export default function HeroAdmin() {
     } catch (err) { console.error(err) }
   }
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Supprimer cette slide ?')) return;
+  const handleDelete = async () => {
+    if (!deleteId) return;
     try {
-      await fetch(`${API_URL}/api/admin/hero/${id}`, {
+      await fetch(`${API_URL}/api/admin/hero/${deleteId}`, {
         method: 'DELETE',
         headers: getAdminHeaders()
       });
+      setDeleteId(null);
       loadSlides();
     } catch (err) { console.error(err) }
   }
@@ -78,6 +83,10 @@ export default function HeroAdmin() {
       title_en: slide.title_en,
       subtitle_fr: slide.subtitle_fr,
       subtitle_en: slide.subtitle_en,
+      gold_text_fr: slide.gold_text_fr || '',
+      gold_text_en: slide.gold_text_en || '',
+      italic_text_fr: slide.italic_text_fr || '',
+      italic_text_en: slide.italic_text_en || '',
       order_index: slide.order_index,
       image: null
     });
@@ -91,7 +100,7 @@ export default function HeroAdmin() {
           <h2 className="text-2xl font-display font-bold text-[var(--a-text)]">Design Hero</h2>
           <p className="text-sm text-[var(--a-text)]/40">Gérez les images et textes de la page d'accueil</p>
         </div>
-        <button 
+        <button
           onClick={() => { setEditingSlide(null); setIsModalOpen(true) }}
           className="flex items-center gap-2 px-4 py-2 bg-gold text-black rounded-lg text-xs font-bold uppercase tracking-widest hover:scale-105 transition-transform"
         >
@@ -106,12 +115,12 @@ export default function HeroAdmin() {
             <div className="absolute inset-0 p-6 flex flex-col justify-end bg-gradient-to-t from-black/80 to-transparent">
               <h3 className="text-white font-bold">{slide.title_fr || 'Sans titre'}</h3>
               <p className="text-white/60 text-xs line-clamp-1">{slide.subtitle_fr}</p>
-              
+
               <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button onClick={() => openEdit(slide)} className="p-2 bg-white/10 backdrop-blur-md rounded-lg text-white hover:bg-gold hover:text-black">
                   <HiOutlinePencil className="w-4 h-4" />
                 </button>
-                <button onClick={() => handleDelete(slide.id)} className="p-2 bg-white/10 backdrop-blur-md rounded-lg text-white hover:bg-red-500">
+                <button onClick={() => setDeleteId(slide.id)} className="p-2 bg-white/10 backdrop-blur-md rounded-lg text-white hover:bg-red-500">
                   <HiOutlineTrash className="w-4 h-4" />
                 </button>
               </div>
@@ -124,7 +133,7 @@ export default function HeroAdmin() {
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -135,37 +144,79 @@ export default function HeroAdmin() {
                 <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-[var(--a-input)] rounded-full text-[var(--a-text)]/40"><HiX className="w-5 h-5" /></button>
               </div>
               
+              <div className="p-4 bg-gold/5 border-b border-[var(--a-border)]">
+                <p className="text-[10px] text-gold font-bold uppercase tracking-widest mb-1 font-display">Guide de Style</p>
+                <div className="flex gap-4 text-[9px] text-[var(--a-text)]/50 font-medium">
+                  <code className="bg-black/20 p-1 rounded">{'{gold}Texte en Or{/gold}'}</code>
+                  <code className="bg-black/20 p-1 rounded">{'{italic}Texte en Italique{/italic}'}</code>
+                </div>
+              </div>
+              
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Titre (FR)</label>
-                    <input type="text" value={formData.title_fr} onChange={e => setFormData({...formData, title_fr: e.target.value})} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)]" />
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30 flex justify-between">
+                      Titre (FR) <span>{'{gold}..{/gold}'}</span>
+                    </label>
+                    <input type="text" value={formData.title_fr} onChange={e => setFormData({ ...formData, title_fr: e.target.value })} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)]" placeholder="L'élégance du {gold}Caftan{/gold}" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Title (EN)</label>
-                    <input type="text" value={formData.title_en} onChange={e => setFormData({...formData, title_en: e.target.value})} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)]" />
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30 flex justify-between">
+                      Title (EN) <span>{'{italic}..{/italic}'}</span>
+                    </label>
+                    <input type="text" value={formData.title_en} onChange={e => setFormData({ ...formData, title_en: e.target.value })} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)]" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gold flex justify-between">
+                      Mots en Or (FR) <span className="opacity-40">Or scintillant</span>
+                    </label>
+                    <input type="text" value={formData.gold_text_fr} onChange={e => setFormData({ ...formData, gold_text_fr: e.target.value })} className="w-full bg-[var(--a-input)] border border-gold/20 rounded-xl p-3 text-sm text-[var(--a-text)]" placeholder="Ex: Marocain" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#B4975A] flex justify-between italic">
+                      Mots en Italique (FR) <span className="opacity-40 font-normal">Style Signature</span>
+                    </label>
+                    <input type="text" value={formData.italic_text_fr} onChange={e => setFormData({ ...formData, italic_text_fr: e.target.value })} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)] italic" placeholder="Ex: Elégance, Caftan" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-gold flex justify-between opacity-50">
+                      Gold Keywords (EN)
+                    </label>
+                    <input type="text" value={formData.gold_text_en} onChange={e => setFormData({ ...formData, gold_text_en: e.target.value })} className="w-full bg-[var(--a-input)] border border-gold/10 rounded-xl p-3 text-sm text-[var(--a-text)]" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#B4975A] flex justify-between italic opacity-50">
+                      Italic Keywords (EN)
+                    </label>
+                    <input type="text" value={formData.italic_text_en} onChange={e => setFormData({ ...formData, italic_text_en: e.target.value })} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)] italic" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Sous-titre (FR)</label>
-                    <textarea value={formData.subtitle_fr} onChange={e => setFormData({...formData, subtitle_fr: e.target.value})} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)] h-20" />
+                    <textarea value={formData.subtitle_fr} onChange={e => setFormData({ ...formData, subtitle_fr: e.target.value })} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)] h-20" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Subtitle (EN)</label>
-                    <textarea value={formData.subtitle_en} onChange={e => setFormData({...formData, subtitle_en: e.target.value})} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)] h-20" />
+                    <textarea value={formData.subtitle_en} onChange={e => setFormData({ ...formData, subtitle_en: e.target.value })} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)] h-20" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Image</label>
-                    <input type="file" onChange={e => setFormData({...formData, image: e.target.files[0]})} className="text-xs text-[var(--a-text)]/40" />
+                    <input type="file" onChange={e => setFormData({ ...formData, image: e.target.files[0] })} className="text-xs text-[var(--a-text)]/40" />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Ordre</label>
-                    <input type="number" value={formData.order_index} onChange={e => setFormData({...formData, order_index: e.target.value})} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)]" />
+                    <input type="number" value={formData.order_index} onChange={e => setFormData({ ...formData, order_index: e.target.value })} className="w-full bg-[var(--a-input)] border border-[var(--a-border)] rounded-xl p-3 text-sm text-[var(--a-text)]" />
                   </div>
                 </div>
 
@@ -175,6 +226,16 @@ export default function HeroAdmin() {
           </div>
         )}
       </AnimatePresence>
+
+      <ConfirmationModal
+        isOpen={!!deleteId}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteId(null)}
+        title="Supprimer la slide ?"
+        message="Cette action supprimera définitivement cette image et ses textes du carrousel d'accueil."
+        confirmText="Supprimer"
+        type="danger"
+      />
     </div>
   )
 }

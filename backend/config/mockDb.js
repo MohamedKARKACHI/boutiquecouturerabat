@@ -16,7 +16,11 @@ let users = [
 ];
 
 let hero_slides = [
-  { id: 1, image_path: 'slide1.jpg', title_fr: 'Élégance Royale', title_en: 'Royal Elegance', subtitle_fr: 'Haute Couture Artisanale', subtitle_en: 'Artisanal Haute Couture', order_index: 0, is_active: 1 }
+  { id: 1, image_path: 'slide1.jpg', title_fr: 'L\'Élégance du Caftan Marocain Authentique', title_en: 'Authentic Moroccan Caftan Elegance', gold_text_fr: 'Marocain', gold_text_en: 'Moroccan', italic_text_fr: 'L\'Élégance, du Caftan, Authentique', italic_text_en: 'Authentic, Elegance', subtitle_fr: 'Haute Couture & Créations Sur-Mesure par Aziz Bousseta', subtitle_en: 'Bespoke Haute Couture by Aziz Bousseta', order_index: 0, is_active: 1 },
+  { id: 2, image_path: 'slide2.jpg', title_fr: 'L\'Élégance du Caftan Marocain Authentique', title_en: 'Authentic Moroccan Caftan Elegance', gold_text_fr: 'Marocain', gold_text_en: 'Moroccan', italic_text_fr: 'L\'Élégance, du Caftan, Authentique', italic_text_en: 'Authentic, Elegance', subtitle_fr: 'Haute Couture & Créations Sur-Mesure par Aziz Bousseta', subtitle_en: 'Bespoke Haute Couture by Aziz Bousseta', order_index: 1, is_active: 1 },
+  { id: 3, image_path: 'slide3.jpg', title_fr: 'L\'Élégance du Caftan Marocain Authentique', title_en: 'Authentic Moroccan Caftan Elegance', gold_text_fr: 'Marocain', gold_text_en: 'Moroccan', italic_text_fr: 'L\'Élégance, du Caftan, Authentique', italic_text_en: 'Authentic, Elegance', subtitle_fr: 'Haute Couture & Créations Sur-Mesure par Aziz Bousseta', subtitle_en: 'Bespoke Haute Couture by Aziz Bousseta', order_index: 2, is_active: 1 },
+  { id: 4, image_path: 'slide4.jpg', title_fr: 'L\'Élégance du Caftan Marocain Authentique', title_en: 'Authentic Moroccan Caftan Elegance', gold_text_fr: 'Marocain', gold_text_en: 'Moroccan', italic_text_fr: 'L\'Élégance, du Caftan, Authentique', italic_text_en: 'Authentic, Elegance', subtitle_fr: 'Haute Couture & Créations Sur-Mesure par Aziz Bousseta', subtitle_en: 'Bespoke Haute Couture by Aziz Bousseta', order_index: 3, is_active: 1 },
+  { id: 5, image_path: 'slide5.jpg', title_fr: 'L\'Élégance du Caftan Marocain Authentique', title_en: 'Authentic Moroccan Caftan Elegance', gold_text_fr: 'Marocain', gold_text_en: 'Moroccan', italic_text_fr: 'L\'Élégance, du Caftan, Authentique', italic_text_en: 'Authentic, Elegance', subtitle_fr: 'Haute Couture & Créations Sur-Mesure par Aziz Bousseta', subtitle_en: 'Bespoke Haute Couture by Aziz Bousseta', order_index: 4, is_active: 1 }
 ];
 
 let settings = [

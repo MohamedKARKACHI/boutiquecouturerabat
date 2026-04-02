@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { 
   HiOutlineViewGrid, HiOutlineShoppingBag, HiOutlineTag, 
   HiOutlinePhotograph, HiOutlineLogout, HiMenuAlt2, HiX,
-  HiOutlineSun, HiOutlineMoon, HiOutlineEye, HiOutlineEyeOff, HiOutlineColorSwatch
+  HiOutlineSun, HiOutlineMoon, HiOutlineEye, HiOutlineEyeOff, HiOutlineColorSwatch,
+  HiPlus
 } from 'react-icons/hi'
 import { ToastProvider } from '../../components/Admin/AdminToast'
 import AdminStats from '../../components/Admin/AdminStats'
@@ -14,6 +15,7 @@ import ColorsAdmin from '../../components/Admin/ColorsAdmin'
 import { fetchProducts, fetchCategories, fetchGallery, adminLogin, fetchSettings } from '../../api'
 import HeroAdmin from '../../components/Admin/HeroAdmin'
 import SettingsAdmin from '../../components/Admin/SettingsAdmin'
+import ConfirmationModal from '../../components/Admin/ConfirmationModal'
 
 const NAV_ITEMS = [
   { key: 'dashboard', label: 'Dashboard', icon: HiOutlineViewGrid },
@@ -27,7 +29,9 @@ const NAV_ITEMS = [
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard')
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('adminToken'))
+  const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem('adminToken'))
+  const [isMoreOpen, setIsMoreOpen] = useState(false)
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false)
   const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -58,7 +62,7 @@ export default function AdminDashboard() {
     setError('')
     try {
       const data = await adminLogin(username, password)
-      localStorage.setItem('adminToken', data.token)
+      sessionStorage.setItem('adminToken', data.token)
       setIsAuthenticated(true)
     } catch (err) {
       setError(err.message)
@@ -71,7 +75,7 @@ export default function AdminDashboard() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('adminToken')
+    sessionStorage.removeItem('adminToken')
     setIsAuthenticated(false)
   }
 
@@ -258,7 +262,7 @@ export default function AdminDashboard() {
               {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
             </button>
             <button 
-              onClick={handleLogout}
+              onClick={() => setIsLogoutConfirmOpen(true)}
               className="mt-auto flex items-center gap-4 py-4 px-6 text-[var(--a-text)]/30 hover:text-red-400 transition-colors border-t border-[var(--a-border)]"
             >
               <HiOutlineLogout className="w-5 h-5" />
@@ -283,7 +287,7 @@ export default function AdminDashboard() {
                 {theme === 'dark' ? <HiOutlineSun className="w-4 h-4" /> : <HiOutlineMoon className="w-4 h-4" />}
               </button>
               <button 
-                onClick={() => { if (window.confirm('Se déconnecter ?')) setIsAuthenticated(false) }}
+                onClick={() => setIsLogoutConfirmOpen(true)}
                 className="p-2.5 rounded-xl bg-[var(--a-panel)] border border-[var(--a-border)] text-red-500/60 hover:text-red-500 transition-all"
               >
                 <HiOutlineLogout className="w-4 h-4" />
@@ -332,11 +336,11 @@ export default function AdminDashboard() {
 
         {/* ── Mobile Bottom Tab Bar ── */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[var(--a-bg)]/95 backdrop-blur-xl border-t border-[var(--a-border)] flex items-center justify-between px-1" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)' }}>
-          {NAV_ITEMS.map(item => (
+          {NAV_ITEMS.slice(0, 4).map(item => (
             <button
               key={item.key}
               onClick={() => handleNavigate(item.key)}
-              className={`flex-1 flex flex-col items-center gap-1.5 py-3 px-1 transition-all duration-200 relative ${
+              className={`flex-1 flex flex-col items-center gap-1.5 py-2 px-1 transition-all duration-200 relative ${
                 activeTab === item.key
                   ? 'text-gold'
                   : 'text-[var(--a-text)]/30'
@@ -345,7 +349,7 @@ export default function AdminDashboard() {
               {activeTab === item.key && (
                 <motion.div
                   layoutId="bottomTabIndicator"
-                  className="absolute -top-0.5 w-8 h-0.5 bg-gold rounded-full"
+                  className="absolute -top-1 w-8 h-0.5 bg-gold rounded-full"
                   transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
               )}
@@ -353,7 +357,85 @@ export default function AdminDashboard() {
               <span className="text-[8px] font-bold uppercase truncate w-full text-center tracking-tight">{item.label}</span>
             </button>
           ))}
+          
+          {/* Plus Button */}
+          <button
+            onClick={() => setIsMoreOpen(true)}
+            className={`flex-1 flex flex-col items-center gap-1.5 py-2 px-1 transition-all duration-200 relative ${
+              NAV_ITEMS.slice(4).some(i => i.key === activeTab)
+                ? 'text-gold'
+                : 'text-[var(--a-text)]/30'
+            }`}
+          >
+            {NAV_ITEMS.slice(4).some(i => i.key === activeTab) && (
+              <motion.div
+                layoutId="bottomTabIndicator"
+                className="absolute -top-1 w-8 h-0.5 bg-gold rounded-full"
+                transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+              />
+            )}
+            <HiPlus className="w-5 h-5 shrink-0" />
+            <span className="text-[8px] font-bold uppercase truncate w-full text-center tracking-tight">Plus</span>
+          </button>
         </nav>
+
+        {/* ── More Menu Drawer ── */}
+        <AnimatePresence>
+          {isMoreOpen && (
+            <>
+              {/* Backdrop */}
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsMoreOpen(false)}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] lg:hidden"
+              />
+              {/* Drawer Content */}
+              <motion.div 
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="fixed bottom-0 left-0 right-0 z-[60] bg-[var(--a-bg)] border-t border-[var(--a-border)] rounded-t-[2.5rem] p-8 lg:hidden shadow-[0_-20px_50px_rgba(0,0,0,0.3)]"
+              >
+                <div className="w-12 h-1.5 bg-[var(--a-border)] rounded-full mx-auto mb-8 opacity-30" />
+                <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-[var(--a-text)]/30 mb-8 text-center">Autres Options</h3>
+                <div className="grid grid-cols-3 gap-6">
+                  {NAV_ITEMS.slice(4).map(item => (
+                    <button
+                      key={item.key}
+                      onClick={() => {
+                        handleNavigate(item.key)
+                        setIsMoreOpen(false)
+                      }}
+                      className="flex flex-col items-center gap-3 p-4 rounded-2xl bg-[var(--a-panel)] border border-[var(--a-border)] hover:border-gold/30 hover:bg-gold/5 transition-all"
+                    >
+                      <item.icon className={`w-6 h-6 ${activeTab === item.key ? 'text-gold' : 'text-[var(--a-text)]/40'}`} />
+                      <span className={`text-[10px] font-bold uppercase tracking-tight text-center ${activeTab === item.key ? 'text-[var(--a-text)]' : 'text-[var(--a-text)]/40'}`}>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <button 
+                  onClick={() => setIsMoreOpen(false)}
+                  className="w-full mt-10 py-4 bg-[var(--a-sub)] text-[var(--a-text)]/50 font-bold text-[10px] uppercase tracking-widest rounded-xl"
+                >
+                  Fermer
+                </button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        <ConfirmationModal
+          isOpen={isLogoutConfirmOpen}
+          onConfirm={handleLogout}
+          onCancel={() => setIsLogoutConfirmOpen(false)}
+          title="Se déconnecter ?"
+          message="Voulez-vous vraiment quitter votre session administrateur ?"
+          confirmText="Déconnexion"
+          type="danger"
+        />
       </div>
     </ToastProvider>
   )

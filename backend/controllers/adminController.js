@@ -207,11 +207,11 @@ exports.getHeroSlides = async (req, res, next) => {
 
 exports.createHeroSlide = async (req, res, next) => {
   try {
-    const { title_fr, title_en, subtitle_fr, subtitle_en, order_index } = req.body;
+    const { title_fr, title_en, subtitle_fr, subtitle_en, order_index, gold_text_fr, gold_text_en, italic_text_fr, italic_text_en } = req.body;
     const image_path = req.file ? req.file.filename : '';
     await db.query(
-      'INSERT INTO hero_slides (image_path, title_fr, title_en, subtitle_fr, subtitle_en, order_index) VALUES (?, ?, ?, ?, ?, ?)',
-      [image_path, title_fr || '', title_en || '', subtitle_fr || '', subtitle_en || '', order_index || 0]
+      'INSERT INTO hero_slides (image_path, title_fr, title_en, subtitle_fr, subtitle_en, order_index, gold_text_fr, gold_text_en, italic_text_fr, italic_text_en) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [image_path, title_fr || '', title_en || '', subtitle_fr || '', subtitle_en || '', order_index || 0, gold_text_fr || '', gold_text_en || '', italic_text_fr || '', italic_text_en || '']
     );
     res.status(201).json({ message: 'Hero slide created' });
   } catch (error) {
@@ -222,19 +222,19 @@ exports.createHeroSlide = async (req, res, next) => {
 exports.updateHeroSlide = async (req, res, next) => {
   try {
     const itemId = req.params.id;
-    const { title_fr, title_en, subtitle_fr, subtitle_en, order_index, is_active } = req.body;
-
-    let query = 'UPDATE hero_slides SET title_fr=?, title_en=?, subtitle_fr=?, subtitle_en=?, order_index=?, is_active=?';
-    const params = [title_fr || '', title_en || '', subtitle_fr || '', subtitle_en || '', order_index || 0, is_active === 'true'];
-
+    const { title_fr, title_en, subtitle_fr, subtitle_en, order_index, is_active, gold_text_fr, gold_text_en, italic_text_fr, italic_text_en } = req.body;
+ 
+    let query = 'UPDATE hero_slides SET title_fr=?, title_en=?, subtitle_fr=?, subtitle_en=?, order_index=?, is_active=?, gold_text_fr=?, gold_text_en=?, italic_text_fr=?, italic_text_en=?';
+    const params = [title_fr || '', title_en || '', subtitle_fr || '', subtitle_en || '', order_index || 0, is_active === 'true', gold_text_fr || '', gold_text_en || '', italic_text_fr || '', italic_text_en || ''];
+ 
     if (req.file) {
       query += ', image_path=?';
       params.push(req.file.filename);
     }
-
+ 
     query += ' WHERE id=?';
     params.push(itemId);
-
+ 
     await db.query(query, params);
     res.json({ message: 'Hero slide updated successfully' });
   } catch (error) {

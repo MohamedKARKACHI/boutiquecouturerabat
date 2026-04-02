@@ -58,7 +58,7 @@ export const adminLogin = async (username, password) => {
 
 // Helper to get headers with token
 export const getAdminHeaders = () => {
-  const token = localStorage.getItem('adminToken');
+  const token = sessionStorage.getItem('adminToken');
   return {
     'Authorization': `Bearer ${token}`
   };

@@ -4,6 +4,7 @@ import { HiX, HiChevronLeft, HiChevronRight } from 'react-icons/hi'
 import { FaWhatsapp } from 'react-icons/fa'
 import ImageViewer from './ImageViewer'
 import { useLanguage } from '../context/LanguageContext'
+import StorefrontModal from './StorefrontModal'
 
 const TRANSLATIONS = {
   FR: {
@@ -50,6 +51,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
   const [customerName, setCustomerName] = useState('')
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showViewer, setShowViewer] = useState(false)
+  const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const scrollRef = useRef(null)
 
@@ -116,7 +118,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
 
   const handleOrder = () => {
     if (!selectedSize || !customerName.trim()) {
-      alert(T.errorFields)
+      setIsAlertOpen(true)
       return
     }
 
@@ -389,6 +391,15 @@ export default function ProductModal({ isOpen, product, onClose }) {
         images={images}
         startIndex={currentImageIndex}
         onClose={() => setShowViewer(false)}
+      />
+
+      {/* Validation Alert */}
+      <StorefrontModal
+        isOpen={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+        title={lang === 'FR' ? 'Champs incomplets' : 'Missing fields'}
+        message={T.errorFields}
+        type="error"
       />
     </>
   )
