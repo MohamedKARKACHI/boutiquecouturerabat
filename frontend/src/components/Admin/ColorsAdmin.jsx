@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { HiPlus, HiTrash } from 'react-icons/hi'
-import { fetchColors } from '../../api'
+import { fetchColors, getAdminHeaders } from '../../api'
 import ConfirmationModal from './ConfirmationModal'
 import { useToast } from './AdminToast'
 
@@ -51,7 +51,7 @@ export default function ColorsAdmin() {
     try {
       const resp = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...getAdminHeaders() },
         body: JSON.stringify({ name: formData.name, hex_code: formData.hex_code })
       })
 
@@ -73,7 +73,10 @@ export default function ColorsAdmin() {
   const handleDelete = async () => {
     if (!deleteId) return
     try {
-      const resp = await fetch(`${API_URL}/api/admin/colors/${deleteId}`, { method: 'DELETE' })
+      const resp = await fetch(`${API_URL}/api/admin/colors/${deleteId}`, { 
+        method: 'DELETE',
+        headers: getAdminHeaders()
+      })
       if (!resp.ok) throw new Error('Erreur')
       setDeleteId(null)
       await loadData()

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 import MainLayout from './components/Layout/MainLayout'
+import ScrollToTop from './components/ScrollToTop'
 import Home from './pages/Home'
 import Shop from './pages/Shop'
 import Legal from './pages/Legal'
@@ -11,14 +12,15 @@ const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard'))
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<MainLayout><Home /></MainLayout>} />
-        <Route path="/shop" element={<MainLayout><Shop /></MainLayout>} />
+        <Route path="/shop/*" element={<MainLayout><Shop /></MainLayout>} />
         <Route path="/legal" element={<MainLayout><Legal /></MainLayout>} />
         
-        {/* Admin Route (Still discreet - not in nav) */}
-        <Route path="/admin" element={
+        {/* Admin Route (Handles sub-paths like /admin/colors) */}
+        <Route path="/admin/*" element={
           <Suspense fallback={
             <div className="min-h-screen bg-charcoal flex items-center justify-center">
               <div className="flex flex-col items-center gap-4">

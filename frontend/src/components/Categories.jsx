@@ -1,6 +1,6 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
-import ProductModal from './ProductModal'
+import { useNavigate } from 'react-router-dom'
 import Ornament from './Ornament'
 import { fetchCategories } from '../api'
 import { useLanguage } from '../context/LanguageContext'
@@ -24,14 +24,13 @@ const TRANSLATIONS = {
   }
 }
 
-
 export default function Categories() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
-  const [selectedProduct, setSelectedProduct] = useState(null)
   const [collections, setCollections] = useState([])
   const [loading, setLoading] = useState(true)
   const { lang, t } = useLanguage()
+  const navigate = useNavigate()
   const T = TRANSLATIONS[lang]
 
   useEffect(() => {
@@ -102,7 +101,7 @@ export default function Categories() {
                 {/* Image Container */}
                 <div
                   className="w-full shrink-0 relative aspect-[4/5] overflow-hidden cursor-pointer"
-                  onClick={() => setSelectedProduct(item)}
+                  onClick={() => navigate(`/shop?category=${encodeURIComponent(item.name)}`)}
                 >
                   <img
                     src={imageUrl}
@@ -128,7 +127,7 @@ export default function Categories() {
 
                   <div className="mt-3 md:mt-5">
                     <button
-                      onClick={() => setSelectedProduct(item)}
+                      onClick={() => navigate(`/shop?category=${encodeURIComponent(item.name)}`)}
                       className="w-full flex items-center justify-center gap-1.5 md:gap-2 py-2.5 md:py-3 rounded-xl border-2 border-charcoal/80 text-charcoal text-[11px] sm:text-xs font-bold tracking-[0.15em] uppercase transition-all duration-300 hover:border-gold hover:bg-gold hover:text-white hover:shadow-[0_4px_15px_rgba(212,168,67,0.3)]"
                     >
                       <span>{T.discover}</span>
@@ -141,12 +140,6 @@ export default function Categories() {
           )}
         </div>
       </div>
-
-      <ProductModal
-        isOpen={!!selectedProduct}
-        product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-      />
     </section>
   )
 }

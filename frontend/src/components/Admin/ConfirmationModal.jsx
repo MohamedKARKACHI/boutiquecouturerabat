@@ -53,10 +53,10 @@ export default function ConfirmationModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className="relative w-full max-w-sm bg-[#0d0d14]/90 backdrop-blur-2xl rounded-[3rem] p-10 border border-white/5 shadow-[0_32px_64px_rgba(0,0,0,0.5)] overflow-hidden"
+            className="relative w-full max-w-sm bg-[var(--a-bg)]/95 backdrop-blur-3xl rounded-[3rem] p-10 border border-[var(--a-border)] shadow-[0_32px_64px_rgba(0,0,0,0.3)] overflow-hidden"
           >
             {/* Top accent line */}
-            <div className={`absolute top-0 left-0 w-full h-1 opacity-30 ${type === 'danger' ? 'bg-red-500' : 'bg-gold'}`} />
+            <div className={`absolute top-0 left-0 w-full h-1 opacity-50 ${type === 'danger' ? 'bg-red-500' : 'bg-gold'}`} />
             
             <div className="flex flex-col items-center text-center">
               {/* Icon Circle */}
@@ -64,11 +64,11 @@ export default function ConfirmationModal({
                 <Icon className="w-10 h-10" />
               </div>
               
-              <h3 className="font-display text-xl font-bold text-white mb-3 uppercase tracking-[0.2em] leading-tight">
+              <h3 className="font-display text-xl font-bold text-[var(--a-text)] mb-3 uppercase tracking-[0.2em] leading-tight">
                 {title}
               </h3>
               
-              <p className="text-white/40 text-sm mb-10 leading-relaxed font-medium">
+              <p className="text-[var(--a-text)]/40 text-sm mb-10 leading-relaxed font-medium">
                 {message}
               </p>
               
@@ -84,7 +84,7 @@ export default function ConfirmationModal({
                 )}
                 <button
                   onClick={onCancel}
-                  className="w-full py-4 text-white/30 hover:text-white hover:bg-white/5 rounded-2xl font-bold uppercase tracking-widest text-[11px] transition-all"
+                  className="w-full py-4 text-[var(--a-text)]/30 hover:text-[var(--a-text)] hover:bg-[var(--a-sub)] rounded-2xl font-bold uppercase tracking-widest text-[11px] transition-all"
                 >
                   {cancelText}
                 </button>

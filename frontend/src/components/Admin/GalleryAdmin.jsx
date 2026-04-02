@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { HiPlus, HiTrash, HiX } from 'react-icons/hi'
-import { fetchGallery } from '../../api'
+import { fetchGallery, getAdminHeaders } from '../../api'
 import ConfirmationModal from './ConfirmationModal'
 import { useToast } from './AdminToast'
 
@@ -37,7 +37,11 @@ export default function GalleryAdmin() {
       data.append('order_index', items.length + successCount + 1)
 
       try {
-        const resp = await fetch(`${API_URL}/api/admin/gallery`, { method: 'POST', body: data })
+        const resp = await fetch(`${API_URL}/api/admin/gallery`, { 
+          method: 'POST', 
+          body: data,
+          headers: getAdminHeaders()
+        })
         if (resp.ok) successCount++
       } catch (err) { console.error(err) }
     }
@@ -65,7 +69,10 @@ export default function GalleryAdmin() {
   const handleDelete = async () => {
     if (!deleteId) return
     try {
-      await fetch(`${API_URL}/api/admin/gallery/${deleteId}`, { method: 'DELETE' })
+      await fetch(`${API_URL}/api/admin/gallery/${deleteId}`, { 
+        method: 'DELETE',
+        headers: getAdminHeaders()
+      })
       setDeleteId(null)
       await loadData()
       toast.success('Image supprimée')

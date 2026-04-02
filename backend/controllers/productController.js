@@ -16,8 +16,8 @@ exports.getProducts = async (req, res, next) => {
     const conditions = [];
 
     if (category) {
-      conditions.push('c.slug = ?');
-      params.push(category);
+      conditions.push('(c.slug = ? OR c.name = ?)');
+      params.push(category, category);
     }
     if (minPrice) {
       conditions.push('p.price >= ?');

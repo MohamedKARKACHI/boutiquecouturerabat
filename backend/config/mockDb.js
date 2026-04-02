@@ -8,7 +8,7 @@
  */
 
 // ── Data Store (mutable) ──
-let nextIds = { products: 4, categories: 5, gallery: 7, product_images: 1, hero_slides: 2, users: 2 };
+let nextIds = { products: 4, categories: 5, gallery: 7, colors: 7, product_images: 1, hero_slides: 2, users: 2 };
 
 let users = [
   // $2a$10$6zN8... is a bcrypt hash for 'admin123' (simplified for mock)
@@ -130,7 +130,8 @@ const mockDb = {
 
     // Colors - list all
     if (q.includes('select') && q.includes('from colors') && !q.includes('join')) {
-      return [colors];
+      console.log('[MockDB] SELECT ALL COLORS. Current array state:', JSON.stringify(colors));
+      return [[...colors].sort((a, b) => a.name.localeCompare(b.name))];
     }
 
     // Hero Slides
@@ -201,6 +202,14 @@ const mockDb = {
         id, image_path: params[0], title_fr: params[1], title_en: params[2],
         subtitle_fr: params[3], subtitle_en: params[4], order_index: parseInt(params[5]) || 0, is_active: 1
       });
+      return [{ insertId: id, affectedRows: 1 }];
+    }
+
+    if (q.includes('insert into colors')) {
+      const id = nextIds.colors || 100;
+      nextIds.colors = (nextIds.colors || 100) + 1;
+      const newColor = { id, name: params[0], hex_code: params[1] };
+      colors.push(newColor);
       return [{ insertId: id, affectedRows: 1 }];
     }
 
@@ -292,6 +301,16 @@ const mockDb = {
       return [{ affectedRows: idx !== -1 ? 1 : 0 }];
     }
 
+    if (q.includes('update colors')) {
+      const id = parseInt(params[params.length - 1]);
+      const idx = colors.findIndex(c => c.id === id);
+      if (idx !== -1) {
+        colors[idx].name = params[0];
+        colors[idx].hex_code = params[1];
+      }
+      return [{ affectedRows: idx !== -1 ? 1 : 0 }];
+    }
+
     // ═══════════════════════════════════════
     // DELETE queries
     // ═══════════════════════════════════════
@@ -299,30 +318,49 @@ const mockDb = {
     if (q.includes('delete from products') && q.includes('where id = ?')) {
       const id = parseInt(params[0]);
       const before = products.length;
-      products = products.filter(p => p.id !== id);
-      productImages = productImages.filter(pi => pi.product_id !== id);
+      const filtered = products.filter(p => p.id !== id);
+      products.length = 0;
+      products.push(...filtered);
+      productImages.length = 0;
+      const filteredImages = productImages.filter(pi => pi.product_id !== id);
+      productImages.push(...filteredImages);
       return [{ affectedRows: before - products.length }];
     }
 
     if (q.includes('delete from product_images') && q.includes('where id in')) {
       const ids = Array.isArray(params[0]) ? params[0].map(Number) : [parseInt(params[0])];
       const before = productImages.length;
-      productImages = productImages.filter(pi => !ids.includes(pi.id));
+      const filtered = productImages.filter(pi => !ids.includes(pi.id));
+      productImages.length = 0;
+      productImages.push(...filtered);
       return [{ affectedRows: before - productImages.length }];
     }
 
     if (q.includes('delete from categories') && q.includes('where id = ?')) {
       const id = parseInt(params[0]);
       const before = categories.length;
-      categories = categories.filter(c => c.id !== id);
+      const filtered = categories.filter(c => c.id !== id);
+      categories.length = 0;
+      categories.push(...filtered);
       return [{ affectedRows: before - categories.length }];
     }
 
     if (q.includes('delete from gallery') && q.includes('where id = ?')) {
       const id = parseInt(params[0]);
       const before = gallery.length;
-      gallery = gallery.filter(g => g.id !== id);
+      const filtered = gallery.filter(g => g.id !== id);
+      gallery.length = 0;
+      gallery.push(...filtered);
       return [{ affectedRows: before - gallery.length }];
+    }
+
+    if (q.includes('delete from colors') && q.includes('where id = ?')) {
+      const id = parseInt(params[0]);
+      const before = colors.length;
+      const filtered = colors.filter(c => c.id !== id);
+      colors.length = 0;
+      colors.push(...filtered);
+      return [{ affectedRows: before - colors.length }];
     }
 
     // Default: empty result

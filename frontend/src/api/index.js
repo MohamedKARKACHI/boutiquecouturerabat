@@ -1,32 +1,42 @@
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 export const fetchProducts = async (filters = {}) => {
-  const query = new URLSearchParams(filters).toString();
-  const response = await fetch(`${API_URL}/api/products?${query}`);
+  const query = new URLSearchParams({ ...filters, t: Date.now() }).toString();
+  const response = await fetch(`${API_URL}/api/products?${query}`, {
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (!response.ok) throw new Error('Failed to fetch products');
   return response.json();
 };
 
 export const fetchCategories = async () => {
-  const response = await fetch(`${API_URL}/api/categories`);
+  const response = await fetch(`${API_URL}/api/categories?t=${Date.now()}`, {
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (!response.ok) throw new Error('Failed to fetch categories');
   return response.json();
 };
 
 export const fetchProductById = async (id) => {
-  const response = await fetch(`${API_URL}/api/products/${id}`);
+  const response = await fetch(`${API_URL}/api/products/${id}?t=${Date.now()}`, {
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (!response.ok) throw new Error('Failed to fetch product');
   return response.json();
 };
 
 export const fetchGallery = async () => {
-  const response = await fetch(`${API_URL}/api/gallery`);
+  const response = await fetch(`${API_URL}/api/gallery?t=${Date.now()}`, {
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (!response.ok) throw new Error('Failed to fetch gallery');
   return response.json();
 };
 
 export const fetchColors = async () => {
-  const response = await fetch(`${API_URL}/api/colors`);
+  const response = await fetch(`${API_URL}/api/colors?t=${Date.now()}`, {
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (!response.ok) throw new Error('Failed to fetch colors');
   return response.json();
 };
@@ -60,6 +70,9 @@ export const adminLogin = async (username, password) => {
 export const getAdminHeaders = () => {
   const token = sessionStorage.getItem('adminToken');
   return {
-    'Authorization': `Bearer ${token}`
+    'Authorization': `Bearer ${token}`,
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+    'Expires': '0'
   };
 };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiPlus, HiPencilAlt, HiTrash, HiCheck, HiX, HiChevronDown } from 'react-icons/hi'
-import { fetchProducts, fetchCategories, fetchProductById } from '../../api'
+import { fetchProducts, fetchCategories, fetchProductById, getAdminHeaders } from '../../api'
 import ImageDropZone, { MultiImageDropZone } from './ImageDropZone'
 import ConfirmationModal from './ConfirmationModal'
 import { useToast } from './AdminToast'
@@ -119,7 +119,11 @@ export default function ProductAdmin() {
     }
 
     try {
-      const resp = await fetch(`${API_URL}/api/admin/products${formData.id ? '/' + formData.id : ''}`, { method, body: data })
+      const resp = await fetch(`${API_URL}/api/admin/products${formData.id ? '/' + formData.id : ''}`, { 
+        method, 
+        body: data,
+        headers: getAdminHeaders()
+      })
       if (resp.ok) {
         setIsEditing(false)
         setFormData(EMPTY_FORM)
@@ -139,7 +143,10 @@ export default function ProductAdmin() {
   const handleDelete = async () => {
     if (!deleteId) return
     try {
-      await fetch(`${API_URL}/api/admin/products/${deleteId}`, { method: 'DELETE' })
+      await fetch(`${API_URL}/api/admin/products/${deleteId}`, { 
+        method: 'DELETE',
+        headers: getAdminHeaders()
+      })
       setDeleteId(null)
       await loadData()
       toast.success('Produit supprimé')

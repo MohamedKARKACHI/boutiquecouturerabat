@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiOutlineSearch, HiOutlineFilter, HiX } from 'react-icons/hi'
 import { FaWhatsapp } from 'react-icons/fa'
 import ProductModal from './ProductModal'
-import { fetchProducts, fetchCategories, fetchColors } from '../api'
+import { fetchProducts, fetchCategories, fetchColors, fetchProductById } from '../api'
 import heroImg from '../assets/slide2.jpg'
 import { useLanguage } from '../context/LanguageContext'
 
@@ -62,11 +63,12 @@ const TRANSLATIONS = {
 export default function ShopCollection() {
   const { lang, t } = useLanguage()
   const T = TRANSLATIONS[lang]
+  const [searchParams] = useSearchParams()
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [globalColors, setGlobalColors] = useState([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(searchParams.get('category') || '')
   const [maxPrice, setMaxPrice] = useState(5000)
   const [selectedColors, setSelectedColors] = useState([])
   const [stockFilter, setStockFilter] = useState('all')
@@ -76,8 +78,9 @@ export default function ShopCollection() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        const catFilter = searchParams.get('category');
         const [prodData, catData, colorData] = await Promise.all([
-          fetchProducts(),
+          fetchProducts(catFilter ? { category: catFilter } : {}),
           fetchCategories(),
           fetchColors()
         ])
@@ -280,7 +283,15 @@ export default function ShopCollection() {
                   >
                     <div
                       className="relative aspect-[3/4] bg-transparent overflow-hidden cursor-pointer"
-                      onClick={() => setSelectedProduct(p)}
+                      onClick={async () => {
+                        try {
+                          const fullProduct = await fetchProductById(p.id);
+                          setSelectedProduct(fullProduct);
+                        } catch (err) {
+                          console.error("Failed to fetch product details:", err);
+                          setSelectedProduct(p); // Fallback to list data if fetch fails
+                        }
+                      }}
                     >
                       <img
                         src={`${API_URL}/uploads/${p.main_image}`}
@@ -340,7 +351,15 @@ export default function ShopCollection() {
 
 
                       <button
-                        onClick={() => setSelectedProduct(p)}
+                        onClick={async () => {
+                          try {
+                            const fullProduct = await fetchProductById(p.id);
+                            setSelectedProduct(fullProduct);
+                          } catch (err) {
+                            console.error("Failed to fetch product details:", err);
+                            setSelectedProduct(p);
+                          }
+                        }}
                         className="w-full flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 md:py-3 rounded-xl border-2 border-charcoal/80 text-charcoal text-[10px] sm:text-xs font-bold tracking-[0.15em] uppercase transition-all duration-300 hover:border-gold hover:bg-gold hover:text-white hover:shadow-[0_4px_15px_rgba(212,168,67,0.3)]"
                       >
                         <span>{T.discover}</span>

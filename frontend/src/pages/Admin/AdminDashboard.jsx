@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { 
-  HiOutlineViewGrid, HiOutlineShoppingBag, HiOutlineTag, 
+import {
+  HiOutlineViewGrid, HiOutlineShoppingBag, HiOutlineTag,
   HiOutlinePhotograph, HiOutlineLogout, HiMenuAlt2, HiX,
   HiOutlineSun, HiOutlineMoon, HiOutlineEye, HiOutlineEyeOff, HiOutlineColorSwatch,
   HiPlus
@@ -92,11 +92,11 @@ export default function AdminDashboard() {
         <div className="absolute inset-0 opacity-[0.03]" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4a843' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }} />
-        
+
         {/* Gold glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/5 rounded-full blur-[150px] pointer-events-none" />
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
@@ -111,11 +111,11 @@ export default function AdminDashboard() {
             <h1 className="font-display text-3xl font-bold text-[var(--a-text)] mb-2">Boutique Couturier</h1>
             <p className="text-[var(--a-text)]/30 text-sm">Rabat · Marrakech</p>
           </div>
-          
+
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Identifiant</label>
-              <input 
+              <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
@@ -127,7 +127,7 @@ export default function AdminDashboard() {
             <div className="space-y-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--a-text)]/30">Mot de passe</label>
               <div className="relative">
-                <input 
+                <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -150,8 +150,8 @@ export default function AdminDashboard() {
               <p className="text-red-500 text-[10px] uppercase tracking-widest font-bold text-center">{error}</p>
             )}
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loginLoading}
               className="w-full py-4 bg-gold text-black font-bold text-xs uppercase tracking-[0.2em] rounded-xl shadow-lg shadow-gold/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
             >
@@ -167,7 +167,8 @@ export default function AdminDashboard() {
   return (
     <ToastProvider>
       <div className={`min-h-screen bg-[var(--a-bg)] flex ${theme === 'light' ? 'admin-light' : 'admin-dark'}`}>
-        <style dangerouslySetInnerHTML={{__html: `
+        <style dangerouslySetInnerHTML={{
+          __html: `
           .admin-dark {
             --a-bg: #0d0d14;
             --a-panel: rgba(255, 255, 255, 0.03);
@@ -237,14 +238,13 @@ export default function AdminDashboard() {
           {/* Nav */}
           <nav className="flex flex-col gap-1.5 flex-1">
             {NAV_ITEMS.map(item => (
-              <button 
+              <button
                 key={item.key}
                 onClick={() => handleNavigate(item.key)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                  activeTab === item.key 
-                    ? 'bg-gold/15 text-gold border border-gold/20' 
-                    : 'text-[var(--a-text)]/40 hover:text-[var(--a-text)]/70 hover:bg-[var(--a-panel)] border border-transparent'
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeTab === item.key
+                  ? 'bg-gold/15 text-gold border border-gold/20'
+                  : 'text-[var(--a-text)]/40 hover:text-[var(--a-text)]/70 hover:bg-[var(--a-panel)] border border-transparent'
+                  }`}
               >
                 <item.icon className="w-5 h-5" />
                 <span className="text-sm font-semibold">{item.label}</span>
@@ -254,14 +254,14 @@ export default function AdminDashboard() {
 
           {/* Theme Toggle & Logout */}
           <div className="mt-auto flex flex-col gap-2">
-            <button 
+            <button
               onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
               className="flex items-center gap-3 px-4 py-3 rounded-xl text-[var(--a-text)]/60 hover:text-[var(--a-text)] hover:bg-[var(--a-panel)] transition-all text-sm font-semibold"
             >
               {theme === 'dark' ? <HiOutlineSun className="w-5 h-5" /> : <HiOutlineMoon className="w-5 h-5" />}
               {theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
             </button>
-            <button 
+            <button
               onClick={() => setIsLogoutConfirmOpen(true)}
               className="mt-auto flex items-center gap-4 py-4 px-6 text-[var(--a-text)]/30 hover:text-red-400 transition-colors border-t border-[var(--a-border)]"
             >
@@ -272,21 +272,21 @@ export default function AdminDashboard() {
         </aside>
 
         {/* ── Main Content ── */}
-        <main className="flex-1 p-6 lg:p-10 overflow-y-auto min-h-screen pb-24 lg:pb-10">
-          {/* Mobile top bar */}
-          <div className="lg:hidden flex items-center justify-between mb-6">
+        <main className="flex-1 p-6 pt-20 lg:p-10 lg:pt-10 overflow-y-auto min-h-screen pb-24 lg:pb-10">
+          {/* Mobile top bar (Fixed) */}
+          <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[var(--a-bg)] flex items-center justify-between px-6 py-4">
             <div>
               <h2 className="font-display text-base font-bold text-[var(--a-text)] tracking-wide">Boutique Couturier</h2>
               <p className="text-[8px] text-[var(--a-text)]/25 uppercase tracking-[0.3em]">Panel Admin</p>
             </div>
             <div className="flex items-center gap-2">
-              <button 
+              <button
                 onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
                 className="p-2.5 rounded-xl bg-[var(--a-panel)] border border-[var(--a-border)] text-[var(--a-text)]/50 hover:text-[var(--a-text)] transition-all"
               >
                 {theme === 'dark' ? <HiOutlineSun className="w-4 h-4" /> : <HiOutlineMoon className="w-4 h-4" />}
               </button>
-              <button 
+              <button
                 onClick={() => setIsLogoutConfirmOpen(true)}
                 className="p-2.5 rounded-xl bg-[var(--a-panel)] border border-[var(--a-border)] text-red-500/60 hover:text-red-500 transition-all"
               >
@@ -340,11 +340,10 @@ export default function AdminDashboard() {
             <button
               key={item.key}
               onClick={() => handleNavigate(item.key)}
-              className={`flex-1 flex flex-col items-center gap-1.5 py-2 px-1 transition-all duration-200 relative ${
-                activeTab === item.key
-                  ? 'text-gold'
-                  : 'text-[var(--a-text)]/30'
-              }`}
+              className={`flex-1 flex flex-col items-center gap-1.5 py-2 px-1 transition-all duration-200 relative ${activeTab === item.key
+                ? 'text-gold'
+                : 'text-[var(--a-text)]/30'
+                }`}
             >
               {activeTab === item.key && (
                 <motion.div
@@ -357,15 +356,14 @@ export default function AdminDashboard() {
               <span className="text-[8px] font-bold uppercase truncate w-full text-center tracking-tight">{item.label}</span>
             </button>
           ))}
-          
+
           {/* Plus Button */}
           <button
             onClick={() => setIsMoreOpen(true)}
-            className={`flex-1 flex flex-col items-center gap-1.5 py-2 px-1 transition-all duration-200 relative ${
-              NAV_ITEMS.slice(4).some(i => i.key === activeTab)
-                ? 'text-gold'
-                : 'text-[var(--a-text)]/30'
-            }`}
+            className={`flex-1 flex flex-col items-center gap-1.5 py-2 px-1 transition-all duration-200 relative ${NAV_ITEMS.slice(4).some(i => i.key === activeTab)
+              ? 'text-gold'
+              : 'text-[var(--a-text)]/30'
+              }`}
           >
             {NAV_ITEMS.slice(4).some(i => i.key === activeTab) && (
               <motion.div
@@ -384,7 +382,7 @@ export default function AdminDashboard() {
           {isMoreOpen && (
             <>
               {/* Backdrop */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -392,7 +390,7 @@ export default function AdminDashboard() {
                 className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[55] lg:hidden"
               />
               {/* Drawer Content */}
-              <motion.div 
+              <motion.div
                 initial={{ y: '100%' }}
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
@@ -416,7 +414,7 @@ export default function AdminDashboard() {
                     </button>
                   ))}
                 </div>
-                <button 
+                <button
                   onClick={() => setIsMoreOpen(false)}
                   className="w-full mt-10 py-4 bg-[var(--a-sub)] text-[var(--a-text)]/50 font-bold text-[10px] uppercase tracking-widest rounded-xl"
                 >

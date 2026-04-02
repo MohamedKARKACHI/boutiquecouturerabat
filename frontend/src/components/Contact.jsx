@@ -111,8 +111,13 @@ export default function Contact() {
             initial={{ opacity: 0, x: 24 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.25 }}
-            className="relative h-full min-h-[400px] rounded-2xl overflow-hidden shadow-2xl"
+            className="relative h-full min-h-[400px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-br from-cream via-sand/30 to-cream group"
           >
+            {/* Fallback/Background for AdBlockers */}
+            <div className="absolute inset-0 flex items-center justify-center -z-10">
+              <Ornament />
+            </div>
+
             <iframe
               title="Boutique Couturier Rabat — Marrakech"
               src="https://maps.google.com/maps?q=Boutique%20couturier%20rabat,%20Marrakech&t=&z=16&ie=UTF8&iwloc=&output=embed"
@@ -122,13 +127,32 @@ export default function Contact() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="absolute inset-0"
+              className="absolute inset-0 transition-opacity duration-700 group-hover:opacity-90"
             />
-            {/* Map overlay badge */}
-            <div className="absolute bottom-4 left-4 right-4 bg-charcoal/80 backdrop-blur-sm rounded-xl p-4 border border-gold/20 pointer-events-none">
-              <p className="font-display text-sm text-gold font-semibold">BOUTIQUE COUTURIER RABAT</p>
-              <p className="text-ivory/50 text-xs mt-1">Dar Pacha, Arset Aouzal — Marrakech</p>
+
+            {/* Map Overlay Badge with Directions Button */}
+            <div className="absolute bottom-4 left-4 right-4 bg-charcoal/90 backdrop-blur-2xl rounded-2xl p-5 border border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex flex-col gap-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-display text-xs text-gold font-bold uppercase tracking-[0.2em] mb-1">Boutique Couturier</p>
+                  <p className="text-white/40 text-[10px] uppercase tracking-widest font-medium">Dar Pacha, Arset Aouzal — Marrakech</p>
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center border border-gold/20">
+                  <HiOutlineLocationMarker className="w-4 h-4 text-gold" />
+                </div>
+              </div>
+              
+              <button
+                onClick={() => window.open("https://www.google.com/maps/dir/?api=1&destination=Boutique+Couturier+Rabat+Marrakech", "_blank", "noopener,noreferrer")}
+                className="w-full py-4 bg-gold text-charcoal rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-white transition-all shadow-lg shadow-gold/20 flex items-center justify-center gap-3 active:scale-[0.98] select-none touch-manipulation relative z-[60]"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A2 2 0 013 15.382V5.618a2 2 0 011.447-1.838L9 7m6 13l5.447-2.724A2 2 0 0021 15.382V5.618a2 2 0 00-1.447-1.838L15 7m-6 13V7m6 13V7" />
+                </svg>
+                Itinéraire
+              </button>
             </div>
+
           </motion.div>
 
           {/* CTA Row (spans only under the cards on desktop) */}
