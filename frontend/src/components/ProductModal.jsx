@@ -1,4 +1,4 @@
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useTransform, useScroll } from 'framer-motion'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { HiX, HiChevronLeft, HiChevronRight } from 'react-icons/hi'
 import { FaWhatsapp } from 'react-icons/fa'
@@ -53,7 +53,8 @@ export default function ProductModal({ isOpen, product, onClose }) {
   const [showViewer, setShowViewer] = useState(false)
   const [isAlertOpen, setIsAlertOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
-  const scrollRef = useRef(null)
+  const desktopScrollRef = useRef(null)
+  const mobileScrollRef = useRef(null)
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768)
@@ -63,10 +64,20 @@ export default function ProductModal({ isOpen, product, onClose }) {
   }, [])
 
   const scrollY = useMotionValue(0)
-  const imgScale = useTransform(scrollY, [0, 200], [1.1, 1])
-  const imgY = useTransform(scrollY, [0, 200], [0, -20])
-  const imgOpacity = useTransform(scrollY, [0, 150], [1, 0.6])
+  const desktopImgScale = useTransform(scrollY, [0, 200], [1.1, 1])
+  const desktopImgY = useTransform(scrollY, [0, 200], [0, -20])
+  const desktopImgOpacity = useTransform(scrollY, [0, 150], [1, 0.6])
   const overlayOpacity = useTransform(scrollY, [0, 150], [0, 0.4])
+
+  const { scrollYProgress } = useScroll({
+    container: mobileScrollRef
+  })
+
+  // WOW Scroll Effects for Mobile
+  const mobileImgScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.85])
+  const mobileImgOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0.4])
+  const mobileImgY = useTransform(scrollYProgress, [0, 0.3], [0, -50])
+  const borderRadius = useTransform(scrollYProgress, [0, 0.3], ["0px", "40px"])
 
   const SIZES = ['S', 'M', 'L', 'XL', 'Sur Mesure']
   const API_URL = import.meta.env.VITE_API_URL || '';
@@ -98,7 +109,8 @@ export default function ProductModal({ isOpen, product, onClose }) {
       setCustomerName('')
       setCurrentImageIndex(0)
       setShowViewer(false)
-      if (scrollRef.current) scrollRef.current.scrollTop = 0
+      if (desktopScrollRef.current) desktopScrollRef.current.scrollTop = 0
+      if (mobileScrollRef.current) mobileScrollRef.current.scrollTop = 0
       scrollY.set(0)
       document.body.style.overflow = 'hidden'
     } else {
@@ -156,26 +168,41 @@ export default function ProductModal({ isOpen, product, onClose }) {
           isMobile ? (
             /* ── MOBILE IMMERSIVE VIEW ── */
             <motion.div
+              ref={mobileScrollRef}
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-0 z-[100] bg-ivory flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth"
+              className="fixed inset-0 z-[100] bg-ivory flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth no-scrollbar"
             >
-              <div className="absolute top-0 left-0 right-0 p-4 z-50 flex items-center justify-between pointer-events-none">
+              <div className="absolute top-0 left-0 right-0 p-4 z-[60] flex items-center justify-between pointer-events-none">
                 <button
                   onClick={onClose}
                   className="pointer-events-auto w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-xl rounded-full shadow-lg text-charcoal active:scale-90 transition-transform"
                 >
                   <HiChevronLeft className="w-8 h-8" />
                 </button>
+
+                {/* Move Zoom Button to Top Right */}
+                <div 
+                  className="pointer-events-auto px-3.5 py-1.5 bg-black/60 backdrop-blur-md rounded-full text-white flex items-center gap-2 border border-white/10 shadow-lg cursor-pointer active:scale-95 transition-all"
+                  onClick={() => setShowViewer(true)}
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                  </svg>
+                  <span className="text-[10px] font-black tracking-[0.1em] uppercase">Zoom</span>
+                </div>
               </div>
 
-              {/* Hero Image */}
-              <div
-                className="relative w-screen h-[70vh] shrink-0 overflow-hidden cursor-zoom-in bg-charcoal"
-                onTouchStart={handleTouchStart}
-                onTouchEnd={handleTouchEnd}
+              <motion.div
+                className="relative w-screen h-[75vh] shrink-0 overflow-hidden bg-charcoal sticky top-0"
+                style={{ 
+                  scale: mobileImgScale,
+                  opacity: mobileImgOpacity,
+                  y: mobileImgY,
+                  borderRadius: borderRadius
+                }}
                 onClick={() => setShowViewer(true)}
               >
                 <AnimatePresence mode="wait">
@@ -195,13 +222,6 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   />
                 </AnimatePresence>
 
-                <div className="absolute bottom-6 right-6 z-40 px-3.5 py-1.5 bg-black/60 backdrop-blur-md rounded-full text-white flex items-center gap-2 border border-white/10 shadow-lg pointer-events-none">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
-                  </svg>
-                  <span className="text-[10px] font-black tracking-[0.1em] uppercase">Zoom</span>
-                </div>
-
                 {/* Mobile Thumbnails */}
                 {images.length > 1 && (
                   <div
@@ -220,7 +240,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
                     ))}
                   </div>
                 )}
-              </div>
+              </motion.div>
 
               {/* Product Info */}
               <div className="relative -mt-10 bg-ivory rounded-t-[45px] p-8 pb-32 flex flex-col gap-8 shadow-[0_-15px_40px_rgba(0,0,0,0.06)] border-t border-white/50">
@@ -339,7 +359,10 @@ export default function ProductModal({ isOpen, product, onClose }) {
                         height: '100%', 
                         width: '100%', 
                         objectFit: 'cover', 
-                        objectPosition: 'top' 
+                        objectPosition: 'top',
+                        scale: desktopImgScale,
+                        y: desktopImgY,
+                        opacity: desktopImgOpacity
                       }}
                     />
                   </AnimatePresence>
@@ -367,7 +390,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   )}
                 </div>
 
-                <div ref={scrollRef} onScroll={handleScroll} className="md:w-1/2 overflow-y-auto p-12 flex flex-col bg-white modal-scrollbar">
+                <div ref={desktopScrollRef} onScroll={handleScroll} className="md:w-1/2 overflow-y-auto p-12 flex flex-col bg-white modal-scrollbar">
                   <span className="font-accent text-xs tracking-[0.3em] text-gold uppercase mb-2 block">{product.category_name}</span>
                   <h2 className="font-display text-4xl font-semibold text-charcoal mb-4 leading-tight">{t(product, 'title')}</h2>
 
