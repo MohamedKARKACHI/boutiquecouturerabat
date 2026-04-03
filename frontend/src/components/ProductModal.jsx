@@ -175,7 +175,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="fixed inset-0 z-[100] bg-ivory flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth no-scrollbar"
             >
-              <div className="absolute top-0 left-0 right-0 p-4 z-[60] flex items-center justify-between pointer-events-none">
+              <div className="sticky top-0 left-0 right-0 p-4 z-[70] flex items-center justify-between pointer-events-none mb-[-64px]">
                 <button
                   onClick={onClose}
                   className="pointer-events-auto w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-xl rounded-full shadow-lg text-charcoal active:scale-90 transition-transform"
@@ -198,10 +198,8 @@ export default function ProductModal({ isOpen, product, onClose }) {
               <motion.div
                 className="relative w-screen h-[75vh] shrink-0 overflow-hidden bg-charcoal sticky top-0"
                 style={{ 
-                  scale: mobileImgScale,
                   opacity: mobileImgOpacity,
-                  y: mobileImgY,
-                  borderRadius: borderRadius
+                  y: mobileImgY
                 }}
                 onClick={() => setShowViewer(true)}
               >
