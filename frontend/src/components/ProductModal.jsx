@@ -219,10 +219,25 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   />
                 </AnimatePresence>
 
+                {/* Scroll Hint */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1, duration: 1 }}
+                  className="absolute bottom-32 left-1/2 -translate-x-1/2 z-40 flex flex-col items-center gap-2 pointer-events-none"
+                >
+                  <span className="text-[10px] font-black tracking-[0.3em] uppercase text-white/80 drop-shadow-md">Scroll</span>
+                  <motion.div
+                    animate={{ y: [0, 8, 0] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                    className="w-1 h-8 rounded-full bg-gradient-to-b from-white/80 to-transparent"
+                  />
+                </motion.div>
+
                 {/* Mobile Thumbnails */}
                 {images.length > 1 && (
                   <div
-                    className="absolute bottom-16 left-1/2 -translate-x-1/2 z-30 flex gap-3 p-2.5 bg-black/40 backdrop-blur-3xl rounded-[24px] border border-white/10 shadow-lg overflow-x-auto max-w-[90%] no-scrollbar"
+                    className="absolute bottom-48 left-1/2 -translate-x-1/2 z-30 flex gap-3 p-2.5 bg-black/40 backdrop-blur-3xl rounded-[24px] border border-white/10 shadow-lg overflow-x-auto max-w-[90%] no-scrollbar"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {images.map((img, i) => (
@@ -240,7 +255,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
               </motion.div>
 
               {/* Product Info */}
-              <div className="relative -mt-10 bg-ivory rounded-t-[45px] p-8 pb-32 flex flex-col gap-8 shadow-[0_-15px_40px_rgba(0,0,0,0.06)] border-t border-white/50">
+              <div className="relative -mt-24 bg-ivory rounded-t-[45px] p-8 pb-32 flex flex-col gap-8 shadow-[0_-15px_40px_rgba(0,0,0,0.06)] border-t border-white/50">
                 <div>
                   <span className="text-[10px] tracking-[0.4em] font-accent text-gold uppercase mb-2 block">{product.category_name}</span>
                   <h1 className="text-3xl font-display font-semibold text-charcoal leading-tight mb-3">
