@@ -166,7 +166,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
 
               {/* Hero Image */}
               <div
-                className="relative w-screen h-[66vh] shrink-0 overflow-hidden cursor-zoom-in"
+                className="relative w-screen h-[70vh] shrink-0 overflow-hidden cursor-zoom-in bg-charcoal"
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
                 onClick={() => setShowViewer(true)}
@@ -178,8 +178,13 @@ export default function ProductModal({ isOpen, product, onClose }) {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     src={images[currentImageIndex]}
-                    className="w-full h-full object-cover select-none"
-                    style={{ objectPosition: 'center' }}
+                    className="absolute inset-0 w-full h-full object-cover select-none"
+                    style={{ 
+                      height: '100%', 
+                      width: '100%', 
+                      objectFit: 'cover', 
+                      objectPosition: 'top' 
+                    }}
                   />
                 </AnimatePresence>
 
@@ -311,7 +316,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   <HiX className="w-6 h-6" />
                 </button>
 
-                <div className="md:w-1/2 bg-cream relative flex-shrink-0 overflow-hidden cursor-zoom-in" onClick={() => setShowViewer(true)}>
+                <div className="md:w-1/2 bg-charcoal relative flex-shrink-0 overflow-hidden cursor-zoom-in min-h-[500px]" onClick={() => setShowViewer(true)}>
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={currentImageIndex}
@@ -320,7 +325,13 @@ export default function ProductModal({ isOpen, product, onClose }) {
                       exit={{ opacity: 0 }}
                       src={images[currentImageIndex]}
                       alt={product.title}
-                      className="w-full h-full object-cover"
+                      className="absolute inset-0 w-full h-full object-cover"
+                      style={{ 
+                        height: '100%', 
+                        width: '100%', 
+                        objectFit: 'cover', 
+                        objectPosition: 'top' 
+                      }}
                     />
                   </AnimatePresence>
 

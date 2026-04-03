@@ -14,7 +14,42 @@ export default function ColorsAdmin() {
   const [deleteId, setDeleteId] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({ id: null, name: '', hex_code: '#000000' })
+  const [isNaming, setIsNaming] = useState(false)
   const toast = useToast()
+
+  useEffect(() => {
+    if (!isEditing || !formData.hex_code || formData.hex_code.length !== 7) return
+
+    const timer = setTimeout(async () => {
+      // Trigger if name is empty, whitespace only, or 'Sans Nom'
+      const nameIsEmpty = !formData.name || formData.name.trim() === '' || formData.name === 'Sans Nom'
+      if (!nameIsEmpty) return
+
+      try {
+        setIsNaming(true)
+        const hex = formData.hex_code.replace('#', '')
+        const resp = await fetch(`https://www.thecolorapi.com/id?hex=${hex}`)
+        if (!resp.ok) return
+        const data = await resp.json()
+        
+        if (data.name && data.name.value) {
+          setFormData(prev => {
+            const currentNameIsEmpty = !prev.name || prev.name.trim() === '' || prev.name === 'Sans Nom'
+            if (currentNameIsEmpty) {
+              return { ...prev, name: data.name.value }
+            }
+            return prev
+          })
+        }
+      } catch (err) {
+        console.error('Color API error:', err)
+      } finally {
+        setIsNaming(false)
+      }
+    }, 600)
+
+    return () => clearTimeout(timer)
+  }, [formData.hex_code, formData.name, isEditing])
 
   useEffect(() => {
     loadData()
@@ -107,8 +142,15 @@ export default function ColorsAdmin() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="space-y-2">
                 <label className="text-[11px] font-bold uppercase tracking-widest text-[var(--a-text)]/40">Nom (ex: Beige Sable)</label>
-                <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required
-                  className="w-full bg-[var(--a-input)] border border-[var(--a-border-std)] rounded-xl px-4 py-3 text-[var(--a-text)] focus:border-gold/50 focus:outline-none transition-colors" />
+                <div className="relative">
+                  <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required
+                    className="w-full bg-[var(--a-input)] border border-[var(--a-border-std)] rounded-xl px-4 py-3 text-[var(--a-text)] focus:border-gold/50 focus:outline-none transition-colors" />
+                  {isNaming && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="w-4 h-4 border-2 border-gold/30 border-t-gold rounded-full animate-spin"></div>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="space-y-2">
                 <label className="text-[11px] font-bold uppercase tracking-widest text-[var(--a-text)]/40">Code Hexadécimal</label>
@@ -121,11 +163,14 @@ export default function ColorsAdmin() {
               </div>
             </div>
 
-            <div className="p-5 border border-[var(--a-border-std)] rounded-xl bg-charcoal flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full border-2 border-white/20 shadow-lg" style={{ backgroundColor: formData.hex_code }}></div>
+            <div className="p-5 border border-[var(--a-border-std)] rounded-xl bg-[var(--a-panel-light,var(--a-input))] flex items-center gap-4 transition-all">
+              <div className="w-12 h-12 rounded-full border-2 border-[var(--a-border-std)] shadow-lg" style={{ backgroundColor: formData.hex_code }}></div>
               <div>
-                <p className="text-xs font-bold text-white/50 uppercase tracking-widest mb-0.5">Aperçu</p>
-                <p className="text-white font-medium">{formData.name || 'Sans Nom'} <span className="opacity-50 blur-[0.5px]">({formData.hex_code})</span></p>
+                <p className="text-xs font-bold text-[var(--a-text)]/30 uppercase tracking-widest mb-0.5">Aperçu</p>
+                <p className="text-[var(--a-text)] font-medium">
+                  {formData.name || 'Sans Nom'} 
+                  <span className="opacity-30 ml-2 font-mono text-sm">({formData.hex_code})</span>
+                </p>
               </div>
             </div>
           </div>

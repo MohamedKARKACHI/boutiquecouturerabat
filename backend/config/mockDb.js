@@ -315,18 +315,22 @@ const mockDb = {
     // DELETE queries
     // ═══════════════════════════════════════
 
+    // Products delete
     if (q.includes('delete from products') && q.includes('where id = ?')) {
       const id = parseInt(params[0]);
       const before = products.length;
       const filtered = products.filter(p => p.id !== id);
       products.length = 0;
       products.push(...filtered);
+      
+      const remainingImages = productImages.filter(pi => pi.product_id !== id);
       productImages.length = 0;
-      const filteredImages = productImages.filter(pi => pi.product_id !== id);
-      productImages.push(...filteredImages);
+      productImages.push(...remainingImages);
+      
       return [{ affectedRows: before - products.length }];
     }
 
+    // Product images delete
     if (q.includes('delete from product_images') && q.includes('where id in')) {
       const ids = Array.isArray(params[0]) ? params[0].map(Number) : [parseInt(params[0])];
       const before = productImages.length;
@@ -336,6 +340,7 @@ const mockDb = {
       return [{ affectedRows: before - productImages.length }];
     }
 
+    // Categories delete
     if (q.includes('delete from categories') && q.includes('where id = ?')) {
       const id = parseInt(params[0]);
       const before = categories.length;
@@ -345,22 +350,26 @@ const mockDb = {
       return [{ affectedRows: before - categories.length }];
     }
 
-    if (q.includes('delete from gallery') && q.includes('where id = ?')) {
-      const id = parseInt(params[0]);
-      const before = gallery.length;
-      const filtered = gallery.filter(g => g.id !== id);
-      gallery.length = 0;
-      gallery.push(...filtered);
-      return [{ affectedRows: before - gallery.length }];
-    }
-
-    if (q.includes('delete from colors') && q.includes('where id = ?')) {
+    // Gallery delete
+    // Colors delete
+    if (q.includes('delete') && q.includes('colors') && /id\s*=\s*\?/.test(q)) {
       const id = parseInt(params[0]);
       const before = colors.length;
       const filtered = colors.filter(c => c.id !== id);
       colors.length = 0;
       colors.push(...filtered);
+      console.log(`[MockDB] DELETE colors query matched. ID: ${id}. Before: ${before}, After: ${colors.length}`);
       return [{ affectedRows: before - colors.length }];
+    }
+
+    if (q.includes('delete') && q.includes('gallery') && /id\s*=\s*\?/.test(q)) {
+      const id = parseInt(params[0]);
+      const before = gallery.length;
+      const filtered = gallery.filter(g => g.id !== id);
+      gallery.length = 0;
+      gallery.push(...filtered);
+      console.log(`[MockDB] DELETE gallery query matched. ID: ${id}. Before: ${before}, After: ${gallery.length}`);
+      return [{ affectedRows: before - gallery.length }];
     }
 
     // Default: empty result
