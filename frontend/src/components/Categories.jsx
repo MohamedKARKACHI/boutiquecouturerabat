@@ -1,4 +1,4 @@
-import { motion, useInView } from 'framer-motion'
+import { motion, AnimatePresence, useInView } from 'framer-motion'
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Ornament from './Ornament'
@@ -85,61 +85,121 @@ export default function Categories() {
               </div>
             ))
           ) : (
-          collections.map((item, i) => {
-            const imageUrl = item.image?.startsWith('http')
-              ? item.image
-              : `${API_URL}/uploads/${item.image}`
-
-            return (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 40 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.55, delay: i * 0.12 }}
-                className="group flex flex-col h-full rounded-2xl overflow-hidden bg-white border border-gold/10 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:border-gold/30 hover:shadow-[0_20px_40px_rgba(212,168,67,0.15)] transition-all duration-500"
-              >
-                {/* Image Container */}
-                <div
-                  className="w-full shrink-0 relative aspect-[4/5] overflow-hidden cursor-pointer"
-                  onClick={() => navigate(`/shop?category=${encodeURIComponent(item.name)}`)}
-                >
-                  <img
-                    src={imageUrl}
-                    alt={item.name}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                </div>
-
-                {/* Text */}
-                <div className="flex flex-col flex-1 p-3 pt-0 md:p-5 md:pt-0 lg:p-6 lg:pt-0 relative z-10">
-                  <div className="mb-auto">
-                    <p className="font-accent text-[9px] md:text-[11px] tracking-[0.25em] text-gold-dark/70 uppercase mb-1.5 md:mb-2 line-clamp-1">
-                      {item.name}
-                    </p>
-                    <h3 className="font-display text-xl md:text-2xl text-charcoal font-semibold mb-2 group-hover:text-gold transition-colors">
-                      {t(item, 'name')}
-                    </h3>
-                    <p className="text-sm text-smoke line-clamp-2 mb-6">
-                      {t(item, 'description')}
-                    </p>
-                  </div>
-
-                  <div className="mt-3 md:mt-5">
-                    <button
-                      onClick={() => navigate(`/shop?category=${encodeURIComponent(item.name)}`)}
-                      className="w-full flex items-center justify-center gap-1.5 md:gap-2 py-2.5 md:py-3 rounded-xl border-2 border-charcoal/80 text-charcoal text-[11px] sm:text-xs font-bold tracking-[0.15em] uppercase transition-all duration-300 hover:border-gold hover:bg-gold hover:text-white hover:shadow-[0_4px_15px_rgba(212,168,67,0.3)]"
-                    >
-                      <span>{T.discover}</span>
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            )
-          })
+            collections.map((item, i) => (
+              <CategoryCard 
+                key={item.id} 
+                item={item} 
+                i={i} 
+                inView={inView} 
+                t={t} 
+                navigate={navigate} 
+                API_URL={API_URL} 
+                T={T} 
+              />
+            ))
           )}
         </div>
       </div>
     </section>
+  )
+}
+
+function CategoryCard({ item, i, inView, t, navigate, API_URL, T }) {
+  const [currentImgIndex, setCurrentImgIndex] = useState(0)
+  
+  const mainImg = item?.image
+  let categoryImages = []
+  
+  if (item && item.images && item.images.length > 0) {
+    categoryImages = [...item.images]
+    if (mainImg && !categoryImages.includes(mainImg)) {
+      categoryImages.unshift(mainImg)
+    }
+  } else if (item) {
+    categoryImages = [mainImg]
+  }
+
+  const currentImage = categoryImages[currentImgIndex]
+  const imageUrl = currentImage?.startsWith('http')
+    ? currentImage
+    : `${API_URL}/uploads/${currentImage}`
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, delay: i * 0.12 }}
+      className="group flex flex-col h-full rounded-2xl overflow-hidden bg-white border border-gold/10 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:border-gold/30 hover:shadow-[0_20px_40px_rgba(212,168,67,0.15)] transition-all duration-500"
+    >
+      {/* Image Container */}
+      <div
+        className="w-full shrink-0 relative aspect-[4/5] overflow-hidden cursor-pointer bg-charcoal"
+        onClick={() => navigate(`/shop?category=${encodeURIComponent(item.name)}`)}
+      >
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentImgIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            src={imageUrl}
+            alt={item.name}
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            style={{ height: '100%', width: '100%', objectFit: 'cover', objectPosition: 'top' }}
+          />
+        </AnimatePresence>
+
+        {/* Premium Thumbnail Bar Overlay */}
+        {categoryImages.length > 1 && (
+          <div 
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-1.5 p-1.5 bg-black/40 backdrop-blur-2xl rounded-[18px] border border-white/10 shadow-2xl transition-all"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {categoryImages.map((img, idx) => (
+              <button
+                key={idx}
+                onMouseEnter={() => setCurrentImgIndex(idx)}
+                onClick={() => setCurrentImgIndex(idx)}
+                className={`shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-[12px] overflow-hidden border-2 transition-all duration-300 ${
+                  currentImgIndex === idx 
+                    ? 'border-white scale-110 shadow-lg' 
+                    : 'border-transparent opacity-50 hover:opacity-100 hover:scale-105'
+                }`}
+              >
+                <img 
+                  src={img.startsWith('http') ? img : `${API_URL}/uploads/${img}`} 
+                  className="w-full h-full object-cover" 
+                  alt=""
+                />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Text Container with Spacing fix */}
+      <div className="flex flex-col flex-1 p-3 pt-6 md:p-5 md:pt-8 lg:p-6 lg:pt-8 relative z-10 text-center">
+        <div className="mb-auto">
+          <p className="font-accent text-[9px] md:text-[11px] tracking-[0.25em] text-gold-dark/70 uppercase mb-1.5 md:mb-2 line-clamp-1">
+            {item.name}
+          </p>
+          <h3 className="font-display text-xl md:text-2xl text-charcoal font-semibold mb-2 group-hover:text-gold transition-colors">
+            {t(item, 'name')}
+          </h3>
+          <p className="text-sm text-smoke line-clamp-2 mb-6">
+            {t(item, 'description')}
+          </p>
+        </div>
+
+        <div className="mt-3 md:mt-5">
+          <button
+            onClick={() => navigate(`/shop?category=${encodeURIComponent(item.name)}`)}
+            className="w-full flex items-center justify-center gap-1.5 md:gap-2 py-2.5 md:py-3 rounded-xl border-2 border-charcoal/80 text-charcoal text-[11px] sm:text-xs font-bold tracking-[0.15em] uppercase transition-all duration-300 hover:border-gold hover:bg-gold hover:text-white hover:shadow-[0_4px_15_rgba(212,168,67,0.3)]"
+          >
+            <span>{T.discover}</span>
+          </button>
+        </div>
+      </div>
+    </motion.div>
   )
 }

@@ -35,16 +35,16 @@ let settings = [
 ];
 
 let categories = [
-  { id: 1, name: 'Caftans', name_en: 'Caftans', slug: 'caftans', image: 'caftans.png', description: 'Élégance traditionnelle revisitée', description_en: 'Traditional elegance, reimagined' },
-  { id: 2, name: 'Djellabas', name_en: 'Djellabas', slug: 'djellabas', image: 'djellabas.png', description: 'Confort et style au quotidien', description_en: 'Daily comfort and style' },
-  { id: 3, name: 'Gandouras', name_en: 'Gandouras', slug: 'gandouras', image: 'gandouras.png', description: 'Légèreté et raffinement', description_en: 'Lightweight and refined' },
-  { id: 4, name: 'Abayas', name_en: 'Abayas', slug: 'abayas', image: 'accessories.png', description: 'Modernité et pudeur', description_en: 'Modernity and modesty' }
+  { id: 1, name: 'Caftans', name_en: 'Caftans', slug: 'caftans', image: 'caftans.png', description: 'Élégance traditionnelle', description_en: 'Traditional elegance', images: ['caftans.png', 'gallery1.png', 'gallery3.png', 'slide1.jpg'] },
+  { id: 2, name: 'Djellabas', name_en: 'Djellabas', slug: 'djellabas', image: 'djellabas.png', description: 'Confort et style au quotidien', description_en: 'Daily comfort and style', images: ['djellabas.png', 'gallery2.png', 'gallery5.png', 'slide2.jpg'] },
+  { id: 3, name: 'Gandouras', name_en: 'Gandouras', slug: 'gandouras', image: 'gandouras.png', description: 'Légèreté et raffinement', description_en: 'Lightweight and refined', images: ['gandouras.png', 'gallery4.png', 'gallery6.png', 'slide3.jpg'] },
+  { id: 4, name: 'Abayas', name_en: 'Abayas', slug: 'abayas', image: 'accessories.png', description: 'Modernité et pudeur', description_en: 'Modernity and modesty', images: ['accessories.png', 'gallery1.png', 'gallery2.png'] }
 ];
 
 let products = [
-  { id: 1, category_id: 1, title: 'Caftan Majorelle', title_en: 'Majorelle Caftan', slug: 'caftan-majorelle', description: 'Un caftan d\'exception, brodé à la main avec des fils dorés.', description_en: 'An exceptional caftan, hand-embroidered with golden threads.', price: 3500.00, main_image: 'caftans.png', in_stock: 1, is_featured: 1, category_name: 'Caftans', category_name_en: 'Caftans', colors: '#1C1C1E,#1A2980' },
-  { id: 2, category_id: 2, title: 'Djellaba Artisanale', title_en: 'Artisanal Djellaba', slug: 'djellaba-artisanale', description: 'Djellaba en laine tissée, coupe moderne.', description_en: 'Woven wool djellaba, modern cut.', price: 1800.00, main_image: 'djellabas.png', in_stock: 1, is_featured: 0, category_name: 'Djellabas', category_name_en: 'Djellabas', colors: '#0D6B4B' },
-  { id: 3, category_id: 3, title: 'Gandoura Royale', title_en: 'Royal Gandoura', slug: 'gandoura-royale', description: 'Gandoura en soie naturelle, finitions délicates.', description_en: 'Natural silk gandoura with delicate finishes.', price: 1200.00, main_image: 'gandouras.png', in_stock: 1, is_featured: 0, category_name: 'Gandouras', category_name_en: 'Gandouras', colors: '#D4A843' }
+  { id: 1, category_id: 1, title: 'Caftan Majorelle', title_en: 'Majorelle Caftan', slug: 'caftan-majorelle', description: 'Un caftan d\'exception, brodé à la main avec des fils dorés.', description_en: 'An exceptional caftan, hand-embroidered with golden threads.', price: 3500.00, main_image: 'caftans.png', in_stock: 1, is_featured: 1, category_name: 'Caftans', category_name_en: 'Caftans', colors: '#1C1C1E,#1A2980', images: ['caftans.png', 'gallery1.png', 'gallery3.png', 'slide1.jpg'] },
+  { id: 2, category_id: 2, title: 'Djellaba Artisanale', title_en: 'Artisanal Djellaba', slug: 'djellaba-artisanale', description: 'Djellaba en laine tissée, coupe moderne.', description_en: 'Woven wool djellaba, modern cut.', price: 1800.00, main_image: 'djellabas.png', in_stock: 1, is_featured: 0, category_name: 'Djellabas', category_name_en: 'Djellabas', colors: '#0D6B4B', images: ['djellabas.png', 'gallery2.png', 'gallery5.png'] },
+  { id: 3, category_id: 3, title: 'Gandoura Royale', title_en: 'Royal Gandoura', slug: 'gandoura-royale', description: 'Gandoura en soie naturelle, finitions délicates.', description_en: 'Natural silk gandoura with delicate finishes.', price: 1200.00, main_image: 'gandouras.png', in_stock: 1, is_featured: 0, category_name: 'Gandouras', category_name_en: 'Gandouras', colors: '#D4A843', images: ['gandouras.png', 'gallery4.png', 'gallery6.png'] }
 ];
 
 let productImages = [];
@@ -322,11 +322,11 @@ const mockDb = {
       const filtered = products.filter(p => p.id !== id);
       products.length = 0;
       products.push(...filtered);
-      
+
       const remainingImages = productImages.filter(pi => pi.product_id !== id);
       productImages.length = 0;
       productImages.push(...remainingImages);
-      
+
       return [{ affectedRows: before - products.length }];
     }
 

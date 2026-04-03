@@ -71,16 +71,23 @@ export default function ProductModal({ isOpen, product, onClose }) {
   const SIZES = ['S', 'M', 'L', 'XL', 'Sur Mesure']
   const API_URL = import.meta.env.VITE_API_URL || '';
 
+  const mainImg = product?.main_image || product?.image
   let images = []
+  
   if (product?.images && product.images.length > 0) {
-    images = product.images.map(img => {
-      const imgPath = typeof img === 'string' ? img : (img.path || img.image_path || '')
-      return imgPath.startsWith('http') ? imgPath : `${API_URL}/uploads/${imgPath}`
-    })
-  } else if (product?.main_image || product?.image) {
-    const mainImg = product.main_image || product.image
-    images = [mainImg.startsWith('http') ? mainImg : `${API_URL}/uploads/${mainImg}`]
+    images = [...product.images]
+    if (mainImg && !images.includes(mainImg)) {
+      images.unshift(mainImg)
+    }
+  } else if (mainImg) {
+    images = [mainImg]
   }
+
+  // Pre-process paths
+  images = images.map(img => {
+    const imgPath = typeof img === 'string' ? img : (img.path || img.image_path || '')
+    return imgPath.startsWith('http') ? imgPath : `${API_URL}/uploads/${imgPath}`
+  })
 
   useEffect(() => {
     if (isOpen && product) {
@@ -320,9 +327,11 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={currentImageIndex}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
+                      layoutId={currentImageIndex === 0 ? `prod-img-${product.id}` : undefined}
+                      initial={{ opacity: 0, scale: 1.08 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                       src={images[currentImageIndex]}
                       alt={product.title}
                       className="absolute inset-0 w-full h-full object-cover"
@@ -335,14 +344,21 @@ export default function ProductModal({ isOpen, product, onClose }) {
                     />
                   </AnimatePresence>
 
+                  {/* Desktop Premium Floating Thumbnails */}
                   {images.length > 1 && (
-                    <div className="absolute bottom-4 left-4 z-20 flex gap-2">
+                    <div 
+                      className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex gap-3 p-2 bg-black/40 backdrop-blur-3xl rounded-[24px] border border-white/10 shadow-2xl transition-all"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       {images.map((img, i) => (
                         <button
                           key={i}
-                          onClick={(e) => { e.stopPropagation(); setCurrentImageIndex(i) }}
-                          className={`w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${i === currentImageIndex ? 'border-white shadow-lg' : 'border-transparent opacity-60'
-                            }`}
+                          onClick={() => setCurrentImageIndex(i)}
+                          className={`shrink-0 w-14 h-14 rounded-[16px] overflow-hidden border-2 transition-all duration-300 ${
+                            i === currentImageIndex 
+                              ? 'border-white scale-110 shadow-lg' 
+                              : 'border-transparent opacity-50 hover:opacity-100 hover:scale-105'
+                          }`}
                         >
                           <img src={img} alt="" className="w-full h-full object-cover" />
                         </button>
