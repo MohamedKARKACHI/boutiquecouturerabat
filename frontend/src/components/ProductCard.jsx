@@ -1,83 +1,32 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 export default function ProductCard({ product: p, t, lang, T, API_URL, onDiscover }) {
-  const [currentImgIndex, setCurrentImgIndex] = useState(0)
-
-  // Ensure main_image is the first in the gallery
-  const mainImg = p?.main_image || p?.image
-  let productImages = []
-  
-  if (p && p.images && p.images.length > 0) {
-    productImages = [...p.images]
-    // Ensure mainImg is at the start and not duplicated
-    if (mainImg && !productImages.includes(mainImg)) {
-      productImages.unshift(mainImg)
-    }
-  } else if (p) {
-    productImages = [mainImg]
-  }
-
-  const currentImage = productImages[currentImgIndex] || mainImg
-  const imageUrl = currentImage?.startsWith('http') 
-    ? currentImage 
-    : `${API_URL}/uploads/${currentImage}`
+  const imagePath = p?.main_image || p?.image
+  const imageUrl = imagePath?.startsWith('http') 
+    ? imagePath 
+    : `${API_URL}/uploads/${imagePath}`
 
   return (
     <motion.div
-      layout
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      transition={{ duration: 0.4 }}
-      className="group flex flex-col h-full bg-cream/30 rounded-2xl overflow-hidden hover:bg-cream transition-colors duration-500 pb-4 sm:pb-5"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className="group bg-white rounded-2xl overflow-hidden border border-gold/10 shadow-[0_10px_40px_rgba(0,0,0,0.04)] hover:border-gold/30 hover:shadow-[0_20px_40px_rgba(212,168,67,0.15)] transition-all duration-500 flex flex-col h-full"
     >
-      {/* Image Area with forced cover layout */}
+      {/* Image Container (Fixed 4:5 Aspect Ratio) */}
       <div 
-        className="relative aspect-[3/4] bg-charcoal overflow-hidden cursor-pointer" 
+        className="w-full relative aspect-[4/5] overflow-hidden cursor-pointer"
         onClick={() => onDiscover(p)}
       >
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={currentImgIndex}
-            layoutId={currentImgIndex === 0 ? `prod-img-${p.id}` : undefined}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            src={imageUrl}
-            alt={p ? t(p, 'title') : ''}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            style={{ height: '100%', width: '100%', objectFit: 'cover', objectPosition: 'top' }}
-          />
-        </AnimatePresence>
-
-        {/* Premium Thumbnail Bar */}
-        {productImages.length > 1 && (
-          <div 
-            className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2 p-1.5 bg-black/40 backdrop-blur-2xl rounded-[18px] border border-white/10 shadow-2xl transition-all"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {productImages.map((img, idx) => (
-              <button
-                key={idx}
-                onMouseEnter={() => setCurrentImgIndex(idx)}
-                onClick={() => setCurrentImgIndex(idx)}
-                className={`shrink-0 w-8 h-8 sm:w-9 sm:h-9 rounded-[12px] overflow-hidden border-2 transition-all duration-300 ${
-                  currentImgIndex === idx 
-                    ? 'border-white scale-110 shadow-lg' 
-                    : 'border-transparent opacity-50 hover:opacity-100 hover:scale-105'
-                }`}
-              >
-                <img 
-                  src={(typeof img === 'string' && img.startsWith('http')) ? img : `${API_URL}/uploads/${img}`} 
-                  className="w-full h-full object-cover" 
-                  alt=""
-                />
-              </button>
-            ))}
-          </div>
-        )}
-
+        <img
+          src={imageUrl}
+          alt={p ? t(p, 'title') : ''}
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          style={{ height: '100%', width: '100%', objectFit: 'cover', objectPosition: 'top' }}
+        />
+        
         {/* Badges */}
         {p && !p.in_stock && (
           <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
