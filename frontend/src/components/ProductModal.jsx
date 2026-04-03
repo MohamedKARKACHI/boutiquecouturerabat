@@ -198,7 +198,6 @@ export default function ProductModal({ isOpen, product, onClose }) {
               <motion.div
                 className="relative w-screen h-[75vh] shrink-0 overflow-hidden bg-charcoal sticky top-0"
                 style={{ 
-                  opacity: mobileImgOpacity,
                   y: mobileImgY
                 }}
                 onClick={() => setShowViewer(true)}
@@ -359,8 +358,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
                         objectFit: 'cover', 
                         objectPosition: 'top',
                         scale: desktopImgScale,
-                        y: desktopImgY,
-                        opacity: desktopImgOpacity
+                        y: desktopImgY
                       }}
                     />
                   </AnimatePresence>
