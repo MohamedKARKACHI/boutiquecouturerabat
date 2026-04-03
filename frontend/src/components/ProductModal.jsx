@@ -173,7 +173,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed inset-0 z-[100] bg-ivory flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth no-scrollbar"
+              className="fixed inset-0 z-[100] bg-charcoal flex flex-col overflow-y-auto overflow-x-hidden scroll-smooth no-scrollbar"
             >
               <div className="sticky top-0 left-0 right-0 p-4 z-[70] flex items-center justify-between pointer-events-none mb-[-64px]">
                 <button
@@ -183,7 +183,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   <HiChevronLeft className="w-8 h-8" />
                 </button>
 
-                {/* Move Zoom Button to Top Right */}
+                {/* Top Right Zoom Button */}
                 <div 
                   className="pointer-events-auto px-3.5 py-1.5 bg-black/60 backdrop-blur-md rounded-full text-white flex items-center gap-2 border border-white/10 shadow-lg cursor-pointer active:scale-95 transition-all"
                   onClick={() => setShowViewer(true)}
@@ -219,7 +219,31 @@ export default function ProductModal({ isOpen, product, onClose }) {
                   />
                 </AnimatePresence>
 
-                {/* Scroll Hint */}
+                {/* Premium Dots Indicator - Nested into card dip */}
+                {images.length > 1 && (
+                  <div className="absolute bottom-18 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2.5 p-2 px-3.5 bg-black/20 backdrop-blur-xl rounded-full border border-white/10">
+                    {images.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentImageIndex(i);
+                        }}
+                        className="relative h-1.5 flex items-center transition-all duration-300"
+                      >
+                        <motion.div
+                          animate={{ 
+                            width: currentImageIndex === i ? 24 : 6,
+                            backgroundColor: currentImageIndex === i ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.4)'
+                          }}
+                          className="h-1.5 rounded-full"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Scroll Hint - Nested into card dip area */}
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -233,25 +257,6 @@ export default function ProductModal({ isOpen, product, onClose }) {
                     className="w-1 h-8 rounded-full bg-gradient-to-b from-white/80 to-transparent"
                   />
                 </motion.div>
-
-                {/* Mobile Thumbnails */}
-                {images.length > 1 && (
-                  <div
-                    className="absolute bottom-48 left-1/2 -translate-x-1/2 z-30 flex gap-3 p-2.5 bg-black/40 backdrop-blur-3xl rounded-[24px] border border-white/10 shadow-lg overflow-x-auto max-w-[90%] no-scrollbar"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    {images.map((img, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentImageIndex(i)}
-                        className={`shrink-0 w-12 h-12 rounded-[16px] overflow-hidden border-2 transition-all duration-300 ${currentImageIndex === i ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-60'
-                          }`}
-                      >
-                        <img src={img} className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                )}
               </motion.div>
 
               {/* Product Info */}
