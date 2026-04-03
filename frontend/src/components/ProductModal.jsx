@@ -196,7 +196,7 @@ export default function ProductModal({ isOpen, product, onClose }) {
               </div>
 
               <motion.div
-                className="relative w-screen h-[75vh] shrink-0 overflow-hidden bg-charcoal sticky top-0"
+                className="relative w-screen h-[80vh] shrink-0 overflow-hidden bg-charcoal sticky top-0"
                 style={{ 
                   y: mobileImgY
                 }}
