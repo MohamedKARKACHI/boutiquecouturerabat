@@ -94,7 +94,7 @@ export default function Hero() {
 
 
       {/* ── Hero Content ── */}
-      <div className="relative z-10 container mx-auto px-6 text-center h-full flex flex-col items-center justify-center">
+      <div className="relative z-10 container mx-auto px-6 text-center h-full flex flex-col items-center justify-center -translate-y-[12vh] md:translate-y-0">
         {/* Ornament */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
